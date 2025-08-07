@@ -76,7 +76,8 @@ with st.sidebar:
     
     rss_input = st.text_area("RSS Feed URLs (one per line)",  
         value="""https://feeds.nbcnews.com/nbcnews/public/news
-http://rss.cnn.com/rss/cnn_us.rss""")
+http://rss.cnn.com/rss/cnn_us.rss
+https://moxie.foxnews.com/google-publisher/latest.xml""")
     
     keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, fire, explosion, chemical, environmental") 
 
@@ -97,5 +98,6 @@ if run_search:
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
         st.markdown(f"**Matched Keyword(s):** {', '.join(article['Matched Keywords'])}")
-        st.markdown(f"**Instance Where Keyword is Found:** {','.join(article['Context'])}")
+        # st.markdown(f"**Instance Where Keyword is Found:** {','.join(article['Context'])}")
+        st.markdown(f"**Instance Where Keyword is Found:**\n\n-" + '\n\n-'.join(article['Context']))
         st.markdown("---")
