@@ -87,5 +87,5 @@ if run_search:
         st.markdown(f"### {counter}. {article['Article Title']}") 
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
-        st.markdown(f"Keyword Matched: {article['Matched Keywords']}")
+        st.markdown(f"Matched Keyword(s): {', '.join(article['Matched Keywords'])}")
         st.markdown("---")
