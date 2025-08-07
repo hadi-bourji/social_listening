@@ -2,6 +2,7 @@ import streamlit as st
 import feedparser
 #force Python to skip SSL certificate verification for HTTPS connections
 import ssl
+import re
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -39,19 +40,34 @@ def extract_articles(websites: list):
 function takes "articles" (list of dictionaries where each dictionary contains the relevant information for one article) and "keywords" (list of keywords we want to find articles about) as input
 outputs "relevant_articles" list of articles that contain at least one of the provided keywords
 '''
-def get_relevant_articles(articles: list, keywords: list):   
+
+def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
     count = 1
+
+    keyword_patterns = {
+        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) #make a dict consisting of the original keyword as key and the processed keyword as value. Done to ensure we find exactly the word and not just if they keyword is a substring in the article
+        for keyword in keywords
+    }
+
     for article in articles:
-        for key, value in article.items(): #for each key value pair for each article, we confirm that the value is a string and then check if any of the keywords are in the value
-            if isinstance(value, str) and any(keyword.lower() in value.lower() for keyword in keywords):#if it is we take the article title, link, and publish time and put it in the dict relevant_articles which is the output
-                title = article.get('title')
-                link = article.get('link')
-                published = article.get('published')
-                relevant_articles[count] = {'Article Title': title, 'Article Link': link, 'Date and Time Published': published}
-                count +=1
-                break
-            
+        matched_keywords = set() #unique list
+
+        for key, value in article.items():
+            if isinstance(value, str): # make sure the article info is a string first
+                for keyword, pattern in keyword_patterns.items():
+                    if pattern.search(value): #if the processed keyword is in the article, add the original keyword to a set that contains all keywords in this article
+                        matched_keywords.add(keyword)
+
+        if matched_keywords: #if matched keywords contains a keyword that was matched we add all the info about this article to our relevant articles dict
+            relevant_articles[count] = {
+                'Article Title': article.get('title'),
+                'Article Link': article.get('link'),
+                'Date and Time Published': article.get('published'),
+                'Matched Keywords': sorted(matched_keywords) 
+            }
+            count += 1
+
     return relevant_articles
 
 
@@ -84,4 +100,5 @@ if run_search: #if the user clicks the button
         st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
+        st.markdown(f"Keyword Matched: {article['Matched Keywords']}") #add in the keyword that was matched for each article
         st.markdown("---") #divider

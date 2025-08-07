@@ -1,6 +1,7 @@
 import streamlit as st
 import feedparser
 import ssl
+import re
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -25,20 +26,34 @@ def extract_articles(websites: list):
     return articles
     
 
-def get_relevant_articles(articles: list, keywords: list):   
+def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
     count = 1
-    for article in articles:
-        for key, value in article.items(): 
-            if isinstance(value, str) and any(keyword.lower() in value.lower() for keyword in keywords):
-                title = article.get('title')
-                link = article.get('link')
-                published = article.get('published')
-                relevant_articles[count] = {'Article Title': title, 'Article Link': link, 'Date and Time Published': published}
-                count +=1
-                break   
-    return relevant_articles
 
+    keyword_patterns = {
+        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE)
+        for keyword in keywords
+    }
+
+    for article in articles:
+        matched_keywords = set()
+
+        for key, value in article.items():
+            if isinstance(value, str):
+                for keyword, pattern in keyword_patterns.items():
+                    if pattern.search(value):
+                        matched_keywords.add(keyword)
+
+        if matched_keywords:
+            relevant_articles[count] = {
+                'Article Title': article.get('title'),
+                'Article Link': article.get('link'),
+                'Date and Time Published': article.get('published'),
+                'Matched Keywords': sorted(matched_keywords) 
+            }
+            count += 1
+
+    return relevant_articles
 
 
 
@@ -66,10 +81,11 @@ if run_search:
         articles = extract_articles(rss_feeds) 
         filtered_articles = get_relevant_articles(articles, keywords)
 
-    st.subheader(f"Found {len(filtered_articles)} articles relevant to your desired keywords!") 
+    st.subheader(f"Found {len(filtered_articles)} articles relevant to your desired keywords.") 
 
     for counter, article in filtered_articles.items(): 
         st.markdown(f"### {counter}. {article['Article Title']}") 
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
+        st.markdown(f"Keyword Matched: {article['Matched Keywords']}")
         st.markdown("---")
