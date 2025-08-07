@@ -38,13 +38,19 @@ def get_relevant_articles(articles: list, keywords: list):
     for article in articles:
         matched_keywords = set()
         matched_context = set()
-
+       
         for key, value in article.items():
             if isinstance(value, str):
                 for keyword, pattern in keyword_patterns.items():
                     if pattern.search(value):
                         matched_keywords.add(keyword)
-                        matched_context.add(value)
+                        cleaned_value = re.sub(r'<[^>]+>', ' ', value)
+                        sentences = re.split(r'(?<=[.!?]) +', cleaned_value)
+                        for sentence in sentences:
+                            if pattern.search(sentence):
+                                matched_context.add(sentence.strip())
+
+
 
         if matched_keywords:
             relevant_articles[count] = {
@@ -90,6 +96,6 @@ if run_search:
         st.markdown(f"### {counter}. {article['Article Title']}") 
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
-        st.markdown(f"Matched Keyword(s): {', '.join(article['Matched Keywords'])}")
-        st.markdown(f"Context: {','.join(article['Context'])}")
+        st.markdown(f"**Matched Keyword(s):** {', '.join(article['Matched Keywords'])}")
+        st.markdown(f"**Instance Where Keyword is Found:** {','.join(article['Context'])}")
         st.markdown("---")
