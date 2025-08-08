@@ -44,15 +44,17 @@ def get_relevant_articles(articles: list, keywords: list):
                 for keyword, pattern in keyword_patterns.items():
                     if pattern.search(value): 
                         matched_keywords.add(keyword)
-                        cleaned_value = re.sub(r'<[^>]+>', ' ', value)
+                        cleaned_value = re.sub(r'</p>|<br\s*/?>|</div>', '. ', value, flags=re.IGNORECASE)
+                        cleaned_value = re.sub(r'<[^>]+>', ' ', cleaned_value) 
+                        cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip() 
+
                         sentences = re.split(r'(?<=[.!?]) +', cleaned_value)
                         for sentence in sentences:
                             if pattern.search(sentence):
                                 highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
                                 matched_context.add(highlighted_sentence.strip())
 
-
-
+                            
 
         if matched_keywords: 
             relevant_articles[count] = {

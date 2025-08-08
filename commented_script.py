@@ -60,14 +60,16 @@ def get_relevant_articles(articles: list, keywords: list):
                 for keyword, pattern in keyword_patterns.items(): #loop through keywords
                     if pattern.search(value): #if the processed keyword is in the article, add the original keyword to a set that contains all keywords in this article
                         matched_keywords.add(keyword) 
-                        cleaned_value = re.sub(r'<[^>]+>', ' ', value) #remove all html tags
+                        cleaned_value = re.sub(r'</p>|<br\s*/?>|</div>', '. ', value, flags=re.IGNORECASE) #replace these sentence/paragraph boundary tags with periods
+                        cleaned_value = re.sub(r'<[^>]+>', ' ', cleaned_value) #remove all other html tags
+                        cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip() #clean up by replacing all spacing with a single space
+
+
                         sentences = re.split(r'(?<=[.!?]) +', cleaned_value) #split sentences by punctuation
                         for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it
                             if pattern.search(sentence):
                                 highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
                                 matched_context.add(highlighted_sentence.strip())
-
-
 
 
         if matched_keywords: #if matched keywords is not empty we add all the info about this article to our relevant articles dict
@@ -83,6 +85,9 @@ def get_relevant_articles(articles: list, keywords: list):
     return relevant_articles
 
 
+'''
+GUI code below using streamlit.
+'''
 st.set_page_config(page_title="Incident Feed", layout="wide") #set title that is shown in browser tab
 
 st.title("Lab & Environmental Emergency News Monitor") #set title shown at top of webpage
