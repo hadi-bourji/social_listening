@@ -66,10 +66,15 @@ def get_relevant_articles(articles: list, keywords: list):
 
 
                         sentences = re.split(r'(?<=[.!?]) +', cleaned_value) #split sentences by punctuation
-                        for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it
+                        for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it unless the keyword is found in the link
                             if pattern.search(sentence):
-                                highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
-                                matched_context.add(highlighted_sentence.strip())
+                                    if key =="link": #bolding the keyword in the link can break the link so only bold if the field is not the link field
+                                        highlighted_sentence = pattern.sub(f"{keyword}", sentence)
+                                        matched_context.add(highlighted_sentence.strip())
+                                    else:
+                                        highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                        matched_context.add(highlighted_sentence.strip())
+
 
 
         if matched_keywords: #if matched keywords is not empty we add all the info about this article to our relevant articles dict

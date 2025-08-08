@@ -26,6 +26,7 @@ def extract_articles(websites: list):
     return articles
     
 
+
 def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
     count = 1
@@ -51,10 +52,12 @@ def get_relevant_articles(articles: list, keywords: list):
                         sentences = re.split(r'(?<=[.!?]) +', cleaned_value)
                         for sentence in sentences:
                             if pattern.search(sentence):
-                                highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
-                                matched_context.add(highlighted_sentence.strip())
-
-                            
+                                    if key =="link":
+                                        highlighted_sentence = pattern.sub(f"{keyword}", sentence)
+                                        matched_context.add(highlighted_sentence.strip())
+                                    else:
+                                        highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                        matched_context.add(highlighted_sentence.strip())
 
         if matched_keywords: 
             relevant_articles[count] = {
