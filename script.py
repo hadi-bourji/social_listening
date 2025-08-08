@@ -40,19 +40,21 @@ def get_relevant_articles(articles: list, keywords: list):
         matched_context = set()
        
         for key, value in article.items():
-            if isinstance(value, str):
+            if isinstance(value, str): 
                 for keyword, pattern in keyword_patterns.items():
-                    if pattern.search(value):
+                    if pattern.search(value): 
                         matched_keywords.add(keyword)
                         cleaned_value = re.sub(r'<[^>]+>', ' ', value)
                         sentences = re.split(r'(?<=[.!?]) +', cleaned_value)
                         for sentence in sentences:
                             if pattern.search(sentence):
-                                matched_context.add(sentence.strip())
+                                highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                matched_context.add(highlighted_sentence.strip())
 
 
 
-        if matched_keywords:
+
+        if matched_keywords: 
             relevant_articles[count] = {
                 'Article Title': article.get('title'),
                 'Article Link': article.get('link'),
@@ -98,6 +100,5 @@ if run_search:
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
         st.markdown(f"**Matched Keyword(s):** {', '.join(article['Matched Keywords'])}")
-        # st.markdown(f"**Instance Where Keyword is Found:** {','.join(article['Context'])}")
-        st.markdown(f"**Instance Where Keyword is Found:**\n\n-" + '\n\n-'.join(article['Context']))
+        st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
         st.markdown("---")

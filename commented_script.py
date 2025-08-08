@@ -1,8 +1,8 @@
-import streamlit as st
-import feedparser
+import streamlit as st #GUI
+import feedparser #Parse through RSS
+import re #processing text
 #force Python to skip SSL certificate verification for HTTPS connections
 import ssl
-import re
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -38,6 +38,7 @@ def extract_articles(websites: list):
 
 '''
 function takes "articles" (list of dictionaries where each dictionary contains the relevant information for one article) and "keywords" (list of keywords we want to find articles about) as input
+if article contains a keyword, clean up the field that the keyword was found in and split the field so we can identify only the sentence the keyword was found in
 outputs "relevant_articles" list of articles that contain at least one of the provided keywords
 '''
 
@@ -46,25 +47,36 @@ def get_relevant_articles(articles: list, keywords: list):
     count = 1
 
     keyword_patterns = {
-        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) #make a dict consisting of the original keyword as key and the processed keyword as value. Done to ensure we find exactly the word and not just if they keyword is a substring in the article
+        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE)
         for keyword in keywords
     }
 
     for article in articles:
-        matched_keywords = set() #unique list
-
+        matched_keywords = set() #use set since its a unique list-no duplicates 
+        matched_context = set()
+       
         for key, value in article.items():
             if isinstance(value, str): # make sure the article info is a string first
-                for keyword, pattern in keyword_patterns.items():
+                for keyword, pattern in keyword_patterns.items(): #loop through keywords
                     if pattern.search(value): #if the processed keyword is in the article, add the original keyword to a set that contains all keywords in this article
-                        matched_keywords.add(keyword)
+                        matched_keywords.add(keyword) 
+                        cleaned_value = re.sub(r'<[^>]+>', ' ', value) #remove all html tags
+                        sentences = re.split(r'(?<=[.!?]) +', cleaned_value) #split sentences by punctuation
+                        for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it
+                            if pattern.search(sentence):
+                                highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                matched_context.add(highlighted_sentence.strip())
 
-        if matched_keywords: #if matched keywords contains a keyword that was matched we add all the info about this article to our relevant articles dict
+
+
+
+        if matched_keywords: #if matched keywords is not empty we add all the info about this article to our relevant articles dict
             relevant_articles[count] = {
                 'Article Title': article.get('title'),
                 'Article Link': article.get('link'),
                 'Date and Time Published': article.get('published'),
-                'Matched Keywords': sorted(matched_keywords) 
+                'Matched Keywords': matched_keywords,
+                'Context': matched_context 
             }
             count += 1
 
