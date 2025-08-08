@@ -122,5 +122,5 @@ if run_search: #if the user clicks the button
         st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
-        st.markdown(f"Matched Keyword(s): {', '.join(article['Matched Keywords'])}")#add in the keyword that was matched for each article
+        st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
         st.markdown("---") #divider
