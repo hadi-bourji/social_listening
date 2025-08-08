@@ -47,7 +47,7 @@ def get_relevant_articles(articles: list, keywords: list):
     count = 1
 
     keyword_patterns = {
-        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE)
+        keyword: re.compile(rf'\b{re.escape(keyword)}\b', re.IGNORECASE) #\b{keyword}\b means it matches the keyword as a whole word only so no false positives on substrings
         for keyword in keywords
     }
 
@@ -72,7 +72,7 @@ def get_relevant_articles(articles: list, keywords: list):
                                         highlighted_sentence = pattern.sub(f"{keyword}", sentence)
                                         matched_context.add(highlighted_sentence.strip())
                                     else:
-                                        highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                        highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence) #bold the keyword in the context sentence with capitalization taken exactly from the context
                                         matched_context.add(highlighted_sentence.strip())
 
 

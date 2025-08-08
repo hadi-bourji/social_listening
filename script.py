@@ -56,7 +56,7 @@ def get_relevant_articles(articles: list, keywords: list):
                                         highlighted_sentence = pattern.sub(f"{keyword}", sentence)
                                         matched_context.add(highlighted_sentence.strip())
                                     else:
-                                        highlighted_sentence = pattern.sub(f"**{keyword}**", sentence)
+                                        highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence)
                                         matched_context.add(highlighted_sentence.strip())
 
         if matched_keywords: 
