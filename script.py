@@ -32,6 +32,9 @@ def replace_tag_with_boundary(match, text):
     else:
         return '. '
 
+
+    
+
 def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
     count = 1
@@ -61,15 +64,14 @@ def get_relevant_articles(articles: list, keywords: list):
                         cleaned_value = re.sub(r'<[^>]+>', ' ', text)
                         cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
 
-
-                        sentences = re.split(r'(?<=[.!?])"?(?=\s+)', cleaned_value) 
+                        sentences = re.split(r'(?<=[.!?]")(?=\s+)|(?<=[.!?])(?=\s+)', cleaned_value)                        
                         for sentence in sentences:
                             if pattern.search(sentence):
                                     if key!="title" and key!="link": 
                                         highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence)
                                         matched_context.add(highlighted_sentence.strip())
         if not matched_context: 
-            matched_context.add("Keyword found only in article title and/or website link.") 
+            matched_context.add("Keyword found only in article title and/or URL.") 
 
         if matched_keywords: 
             relevant_articles[count] = {
@@ -101,7 +103,7 @@ https://www.wthr.com/feeds/syndication/rss/news/local
 https://ktla.com/news/california/feed/
 https://abc13.com/feed/""")
     
-    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, explosion, leak, fire, chemical, environmental, flammable") 
+    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="asbestos, mold, lab, explosion, leak, fire, chemical, environmental, flammable") 
 
     run_search = st.button("Run News Scan") 
 
@@ -113,10 +115,11 @@ if run_search:
         articles = extract_articles(rss_feeds) 
         filtered_articles = get_relevant_articles(articles, keywords)
 
-    st.subheader(f"Found {len(filtered_articles)} articles relevant to your desired keywords.") 
+    st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
 
     for counter, article in filtered_articles.items(): 
-        st.markdown(f"### {counter}. {article['Article Title']}") 
+        # st.markdown(f"### {counter}. {article['Article Title']}") #article title is bolded
+        st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
         st.markdown(f"**Published:** {article['Date and Time Published']}")
         st.markdown(f"[Read Article]({article['Article Link']})") 
         st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")

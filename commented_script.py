@@ -85,7 +85,7 @@ def get_relevant_articles(articles: list, keywords: list):
                         cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip() #clean up by replacing all spacing with a single space
 
 
-                        sentences = re.split(r'(?<=[.!?])"?(?=\s+)', cleaned_value) #splits if there is a punctuation or punctuation followed by a quotation mark 
+                        sentences = re.split(r'(?<=[.!?]")(?=\s+)|(?<=[.!?])(?=\s+)', cleaned_value) #splits if there is a punctuation or punctuation followed by a quotation mark 
                         for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it unless the keyword is found in the link
                             if pattern.search(sentence):
                                 if key!="title" and key!="link": #dont put the title or the link in keyword context since they are already present at the top
