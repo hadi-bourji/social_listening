@@ -25,7 +25,12 @@ def extract_articles(websites: list):
             articles.append(article_data)
     return articles
     
-
+def replace_tag_with_boundary(match, text): 
+    before = text[:match.start()] 
+    if re.search(r'[.!?]"?\s*$', before): 
+        return ' '
+    else:
+        return '. '
 
 def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
@@ -45,19 +50,26 @@ def get_relevant_articles(articles: list, keywords: list):
                 for keyword, pattern in keyword_patterns.items():
                     if pattern.search(value): 
                         matched_keywords.add(keyword)
-                        cleaned_value = re.sub(r'</p>|<br\s*/?>|</div>', '. ', value, flags=re.IGNORECASE)
-                        cleaned_value = re.sub(r'<[^>]+>', ' ', cleaned_value) 
-                        cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip() 
 
-                        sentences = re.split(r'(?<=[.!?]) +', cleaned_value)
+                        text = value
+                        text = re.sub(      
+                            r'(</p>|<br\s*/?>|</div>)',
+                            lambda m: replace_tag_with_boundary(m, text),
+                            text,
+                            flags=re.IGNORECASE
+                        )
+                        cleaned_value = re.sub(r'<[^>]+>', ' ', text)
+                        cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
+
+
+                        sentences = re.split(r'(?<=[.!?])"?(?=\s+)', cleaned_value) 
                         for sentence in sentences:
                             if pattern.search(sentence):
-                                    if key =="link":
-                                        highlighted_sentence = pattern.sub(f"{keyword}", sentence)
-                                        matched_context.add(highlighted_sentence.strip())
-                                    else:
+                                    if key!="title" and key!="link": 
                                         highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence)
                                         matched_context.add(highlighted_sentence.strip())
+        if not matched_context: 
+            matched_context.add("Keyword found only in article title and/or website link.") 
 
         if matched_keywords: 
             relevant_articles[count] = {
@@ -83,10 +95,13 @@ with st.sidebar:
     
     rss_input = st.text_area("RSS Feed URLs (one per line)",  
         value="""https://feeds.nbcnews.com/nbcnews/public/news
-http://rss.cnn.com/rss/cnn_us.rss
-https://moxie.foxnews.com/google-publisher/latest.xml""")
+https://moxie.foxnews.com/google-publisher/health.xml
+http://rss.cnn.com/rss/cnn_health.rss
+https://www.wthr.com/feeds/syndication/rss/news/local
+https://ktla.com/news/california/feed/
+https://abc13.com/feed/""")
     
-    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, fire, explosion, chemical, environmental") 
+    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, explosion, leak, fire, chemical, environmental, flammable") 
 
     run_search = st.button("Run News Scan") 
 
