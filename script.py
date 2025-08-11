@@ -2,6 +2,7 @@ import streamlit as st
 import feedparser
 import ssl
 import re
+from datetime import datetime
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -103,7 +104,8 @@ https://www.wthr.com/feeds/syndication/rss/news/local
 https://ktla.com/news/california/feed/
 https://abc13.com/feed/""")
     
-    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="asbestos, mold, lab, explosion, leak, fire, chemical, environmental, flammable") 
+    keyword_input = st.text_input("Desired Keywords (comma-separated)", 
+                                    value="asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, environmental accident, industrial fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
 
     run_search = st.button("Run News Scan") 
 
