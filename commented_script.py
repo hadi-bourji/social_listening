@@ -3,9 +3,12 @@ import feedparser #Parse through RSS
 import re #processing text
 #force Python to skip SSL certificate verification for HTTPS connections
 import ssl
+from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
+count = st_autorefresh(interval=10000, limit=None, key="autorefresh") #refresh every n milliseconds
 
 '''
 function takes a list of websites as input and looks at all useful key value pairs for all news articles on all websites provided
@@ -123,21 +126,27 @@ http://rss.cnn.com/rss/cnn_us.rss""")
     
     keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, fire, explosion, chemical, environmental") #creates a field for the user to input keywords, with a list of default words
 
-    run_search = st.button("Run News Scan") #creates a button with text telling the user what the button does
+#     run_search = st.button("Run News Scan") #creates a button with text telling the user what the button does
 
-if run_search: #if the user clicks the button
-    rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] #we want to take all the text in the rss_feeds input box, and process them into a list of URLs
-    keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] #take all the text in keyword_input input box, split them by comma, if keyword.strip is not empty, append the lowercased keyword
-    
-    with st.spinner("Scanning feeds for relevant articles..."): # when user hits run button give this loading text
-        articles = extract_articles(rss_feeds) #then run the two functions to get the relevant articles
-        filtered_articles = get_relevant_articles(articles, keywords)
+# if run_search: #if the user clicks the button
+rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] #we want to take all the text in the rss_feeds input box, and process them into a list of URLs
+keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] #take all the text in keyword_input input box, split them by comma, if keyword.strip is not empty, append the lowercased keyword
 
-    st.subheader(f"Found {len(filtered_articles)} relevant articles!") #once the above has run, we output the text with the number of articles found
+with st.spinner("Scanning feeds for relevant articles..."): # when user hits run button give this loading text
+    articles = extract_articles(rss_feeds) #then run the two functions to get the relevant articles
+    filtered_articles = get_relevant_articles(articles, keywords)
 
-    for counter, article in filtered_articles.items(): #loop through the filtered_articles dictionary from our function
-        st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
-        st.markdown(f"**Published:** {article['Date and Time Published']}")
-        st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
-        st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
-        st.markdown("---") #divider
+
+last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p") #add in last updated time/date
+st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last updated: {last_updated}</p>",
+    unsafe_allow_html=True) #write update time and date with larger font size, bolded, and blue to pop out
+
+
+st.subheader(f"Found {len(filtered_articles)} relevant articles!") #once the above has run, we output the text with the number of articles found
+
+for counter, article in filtered_articles.items(): #loop through the filtered_articles dictionary from our function
+    st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
+    st.markdown(f"**Published:** {article['Date and Time Published']}")
+    st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
+    st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
+    st.markdown("---") #divider

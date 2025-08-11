@@ -3,9 +3,11 @@ import feedparser
 import ssl
 import re
 from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
+count = st_autorefresh(interval=10000, limit=None, key="autorefresh")
 
 def extract_articles(websites: list):
     articles = [] 
@@ -107,23 +109,29 @@ https://abc13.com/feed/""")
     keyword_input = st.text_input("Desired Keywords (comma-separated)", 
                                     value="asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, environmental accident, industrial fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
 
-    run_search = st.button("Run News Scan") 
+#     run_search = st.button("Run News Scan") 
 
-if run_search: 
-    rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] 
-    keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] 
-    
-    with st.spinner("Scanning feeds for relevant articles..."): 
-        articles = extract_articles(rss_feeds) 
-        filtered_articles = get_relevant_articles(articles, keywords)
+# if run_search: 
+rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] 
+keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] 
 
-    st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
+with st.spinner("Scanning feeds for relevant articles..."): 
+    articles = extract_articles(rss_feeds) 
+    filtered_articles = get_relevant_articles(articles, keywords)
 
-    for counter, article in filtered_articles.items(): 
-        # st.markdown(f"### {counter}. {article['Article Title']}") #article title is bolded
-        st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
-        st.markdown(f"**Published:** {article['Date and Time Published']}")
-        st.markdown(f"[Read Article]({article['Article Link']})") 
-        st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
-        st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
-        st.markdown("---")
+
+last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
+st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last updated: {last_updated}</p>",
+    unsafe_allow_html=True)
+
+
+st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
+
+for counter, article in filtered_articles.items(): 
+    # st.markdown(f"### {counter}. {article['Article Title']}") #article title is bolded
+    st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"**Published:** {article['Date and Time Published']}")
+    st.markdown(f"[Read Article]({article['Article Link']})") 
+    st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
+    st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
+    st.markdown("---")
