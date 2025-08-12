@@ -3,12 +3,15 @@ import feedparser
 import ssl
 import re
 import pytz
+import streamlit.components.v1 as components
+import random
+from dateutil import parser, tz
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-count = st_autorefresh(interval=150000, limit=None, key="autorefresh")
+count = st_autorefresh(interval=40000, limit=None, key="autorefresh")
 
 def extract_articles(websites: list):
     articles = [] 
@@ -151,22 +154,27 @@ st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last
 
 st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
 
+
+tzinfos = {
+    "EST": tz.gettz("America/New_York"),    # Eastern Standard Time (UTC-5)
+    "EDT": tz.gettz("America/New_York"),    # Eastern Daylight Time (UTC-4)
+    "CST": tz.gettz("America/Chicago"),     # Central Standard Time (UTC-6)
+    "CDT": tz.gettz("America/Chicago"),     # Central Daylight Time (UTC-5)
+    "PST": tz.gettz("America/Los_Angeles"), # Pacific Standard Time (UTC-8)
+    "PDT": tz.gettz("America/Los_Angeles"), # Pacific Daylight Time (UTC-7)
+    "GMT": tz.gettz("GMT"),                  # Greenwich Mean Time (UTC+0)
+    "UTC": tz.gettz("UTC"),
+}
+
+
 central = pytz.timezone("America/Chicago")
-
-
-
-
-
 for counter, article in filtered_articles.items(): 
     date_str = article['Date and Time Published']
-    try:
-        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
-    except ValueError:
-        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
-        gmt_time = pytz.timezone("GMT").localize(gmt_time)
+    dt_with_tz = parser.parse(date_str, tzinfos=tzinfos)
+    dt_utc = dt_with_tz.astimezone(pytz.UTC)
+    dt_central = dt_utc.astimezone(central)
+    formatted_time = dt_central.strftime("%I:%M %p %Z %m-%d-%Y")
 
-    ct_time = gmt_time.astimezone(central)
-    formatted_time = ct_time.strftime(f"%I:%M %p %Z %m-%d-%Y")
 
     st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
     st.markdown(f"**Published:** {formatted_time}")
@@ -175,3 +183,14 @@ for counter, article in filtered_articles.items():
     st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
     st.markdown("---")
 
+# html_code = f"""
+# <div id="scroll-to-me" style='background: cyan; height=1px;'>hi</div>
+# <script id="{random.randint(1000, 9999)}">
+#    var e = document.getElementById("scroll-to-me");
+#    if (e) {{
+#      e.scrollIntoView({{behavior: "smooth"}});
+#      e.remove();
+#    }}
+# </script>
+# """
+# components.html(html_code)

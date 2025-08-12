@@ -4,6 +4,9 @@ import re #processing text
 #force Python to skip SSL certificate verification for HTTPS connections
 import ssl
 import pytz
+import streamlit.components.v1 as components
+import random
+from dateutil import parser, tz
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
@@ -157,17 +160,25 @@ st.subheader(f"Found {len(filtered_articles)} relevant articles!") #once the abo
 
 central = pytz.timezone("America/Chicago") #timezone we want to switch to
 
+
+tzinfos = {
+    "EST": tz.gettz("America/New_York"),    # Eastern Standard Time (UTC-5)
+    "EDT": tz.gettz("America/New_York"),    # Eastern Daylight Time (UTC-4)
+    "CST": tz.gettz("America/Chicago"),     # Central Standard Time (UTC-6)
+    "CDT": tz.gettz("America/Chicago"),     # Central Daylight Time (UTC-5)
+    "PST": tz.gettz("America/Los_Angeles"), # Pacific Standard Time (UTC-8)
+    "PDT": tz.gettz("America/Los_Angeles"), # Pacific Daylight Time (UTC-7)
+    "GMT": tz.gettz("GMT"),                  # Greenwich Mean Time (UTC+0)
+    "UTC": tz.gettz("UTC"),
+}
+
 for counter, article in filtered_articles.items(): #loop through the filtered_articles dictionary from our function
     
     date_str = article['Date and Time Published'] #pull date and time of publishing for this article
-    try: #convert to datetime object depending on formatting of timezone in each rss site
-        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
-    except ValueError:
-        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
-        gmt_time = pytz.timezone("GMT").localize(gmt_time)
-
-    ct_time = gmt_time.astimezone(central) #convert time to central time zone
-    formatted_time = ct_time.strftime(f"%I:%M %p %Z %m-%d-%Y") #covnvert to readable string
+    dt_with_tz = parser.parse(date_str, tzinfos=tzinfos) #parse date and time with dictionary to avoid parser misunderstanding time zone abbreviations
+    dt_utc = dt_with_tz.astimezone(pytz.UTC) 
+    dt_central = dt_utc.astimezone(central) #convert all time zones to central
+    formatted_time = dt_central.strftime(f"%I:%M %p %Z %m-%d-%Y") #covnvert to readable string
     
     st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
     st.markdown(f"**Published:** {formatted_time}")
