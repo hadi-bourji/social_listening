@@ -2,12 +2,13 @@ import streamlit as st
 import feedparser
 import ssl
 import re
+import pytz
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-count = st_autorefresh(interval=10000, limit=None, key="autorefresh")
+count = st_autorefresh(interval=15000, limit=None, key="autorefresh")
 
 def extract_articles(websites: list):
     articles = [] 
@@ -27,7 +28,8 @@ def extract_articles(websites: list):
 
             articles.append(article_data)
     return articles
-    
+
+
 def replace_tag_with_boundary(match, text): 
     before = text[:match.start()] 
     if re.search(r'[.!?]"?\s*$', before): 
@@ -35,8 +37,6 @@ def replace_tag_with_boundary(match, text):
     else:
         return '. '
 
-
-    
 
 def get_relevant_articles(articles: list, keywords: list):
     relevant_articles = {}
@@ -100,18 +100,22 @@ with st.sidebar:
     
     rss_input = st.text_area("RSS Feed URLs (one per line)",  
         value="""https://feeds.nbcnews.com/nbcnews/public/news
+http://rss.cnn.com/rss/cnn_topstories.rss
 https://moxie.foxnews.com/google-publisher/health.xml
 http://rss.cnn.com/rss/cnn_health.rss
 https://www.wthr.com/feeds/syndication/rss/news/local
 https://ktla.com/news/california/feed/
-https://abc13.com/feed/""")
+https://abc13.com/feed/
+https://www.latimes.com/nation/rss2.0.xml
+https://feeds.nbcnews.com/nbcnews/public/health
+https://www.theguardian.com/us/environment/rss
+https://rss.csmonitor.com/feeds/science
+""")
     
     keyword_input = st.text_input("Desired Keywords (comma-separated)", 
-                                    value="asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, environmental accident, industrial fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
+                                    value="asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, hazardous materials, environmental accident, industrial fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
 
-#     run_search = st.button("Run News Scan") 
 
-# if run_search: 
 rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] 
 keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] 
 
@@ -127,10 +131,21 @@ st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last
 
 st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
 
+central = pytz.timezone("America/Chicago")
+
 for counter, article in filtered_articles.items(): 
-    # st.markdown(f"### {counter}. {article['Article Title']}") #article title is bolded
+    date_str = article['Date and Time Published']
+    try:
+        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    except ValueError:
+        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
+        gmt_time = pytz.timezone("GMT").localize(gmt_time)
+
+    ct_time = gmt_time.astimezone(central)
+    formatted_time = ct_time.strftime(f"%I:%M %p %Z %m-%d-%Y")
+
     st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
-    st.markdown(f"**Published:** {article['Date and Time Published']}")
+    st.markdown(f"**Published:** {formatted_time}")
     st.markdown(f"[Read Article]({article['Article Link']})") 
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
     st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))

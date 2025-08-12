@@ -3,6 +3,7 @@ import feedparser #Parse through RSS
 import re #processing text
 #force Python to skip SSL certificate verification for HTTPS connections
 import ssl
+import pytz
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
@@ -144,9 +145,22 @@ st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last
 
 st.subheader(f"Found {len(filtered_articles)} relevant articles!") #once the above has run, we output the text with the number of articles found
 
+central = pytz.timezone("America/Chicago") #timezone we want to switch to
+
 for counter, article in filtered_articles.items(): #loop through the filtered_articles dictionary from our function
+    
+    date_str = article['Date and Time Published'] #pull date and time of publishing for this article
+    try: #convert to datetime object depending on formatting of timezone in each rss site
+        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
+    except ValueError:
+        gmt_time = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %Z")
+        gmt_time = pytz.timezone("GMT").localize(gmt_time)
+
+    ct_time = gmt_time.astimezone(central) #convert time to central time zone
+    formatted_time = ct_time.strftime(f"%I:%M %p %Z %m-%d-%Y") #covnvert to readable string
+    
     st.markdown(f"### {counter}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
-    st.markdown(f"**Published:** {article['Date and Time Published']}")
+    st.markdown(f"**Published:** {formatted_time}")
     st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
     st.markdown("---") #divider
