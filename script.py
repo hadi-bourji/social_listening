@@ -8,7 +8,7 @@ from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-count = st_autorefresh(interval=15000, limit=None, key="autorefresh")
+count = st_autorefresh(interval=150000, limit=None, key="autorefresh")
 
 def extract_articles(websites: list):
     articles = [] 
@@ -66,8 +66,18 @@ def get_relevant_articles(articles: list, keywords: list):
                         )
                         cleaned_value = re.sub(r'<[^>]+>', ' ', text)
                         cleaned_value = re.sub(r'\s+', ' ', cleaned_value).strip()
-
-                        sentences = re.split(r'(?<=[.!?]")(?=\s+)|(?<=[.!?])(?=\s+)', cleaned_value)                        
+                        sentences = re.split(
+                                                r"(?<!Mr\.)(?<!Mrs\.)(?<!Ms\.)(?<!Dr\.)(?<!Prof\.)(?<!Rev\.)(?<!Sr\.)(?<!Jr\.)"
+                                                r"(?<!Jan\.)(?<!Feb\.)(?<!Mar\.)(?<!Apr\.)(?<!Jun\.)(?<!Jul\.)(?<!Aug\.)"
+                                                r"(?<!Sep\.)(?<!Sept\.)(?<!Oct\.)(?<!Nov\.)(?<!Dec\.)(?<!St\.)(?<!U\.S\.)"
+                                                r"(?<!U\.K\.)(?<!vs\.)(?<!etc\.)(?<!i\.e\.)(?<!e\.g\.)(?<=[.!?]\")(?=\s+)|"
+                                                r"(?<!Mr\.)(?<!Mrs\.)(?<!Ms\.)(?<!Dr\.)(?<!Prof\.)(?<!Rev\.)(?<!Sr\.)(?<!Jr\.)"
+                                                r"(?<!Jan\.)(?<!Feb\.)(?<!Mar\.)(?<!Apr\.)(?<!Jun\.)(?<!Jul\.)(?<!Aug\.)"
+                                                r"(?<!Sep\.)(?<!Sept\.)(?<!Oct\.)(?<!Nov\.)(?<!Dec\.)(?<!St\.)(?<!U\.S\.)"
+                                                r"(?<!U\.K\.)(?<!vs\.)(?<!etc\.)(?<!i\.e\.)(?<!e\.g\.)(?<=[.!?])(?=\s+)",
+                                                cleaned_value
+                                            )
+                       
                         for sentence in sentences:
                             if pattern.search(sentence):
                                     if key!="title" and key!="link": 
@@ -97,9 +107,9 @@ st.title("Lab & Environmental Emergency News Monitor")
 
 with st.sidebar: 
     st.header("User Inputs:") 
-    
-    rss_input = st.text_area("RSS Feed URLs (one per line)",  
-        value="""https://feeds.nbcnews.com/nbcnews/public/news
+                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh
+    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, Los angeles, hawaii, houston, baton rouge, philadelphia
+        value="""https://feeds.nbcnews.com/nbcnews/public/news 
 http://rss.cnn.com/rss/cnn_topstories.rss
 https://moxie.foxnews.com/google-publisher/health.xml
 http://rss.cnn.com/rss/cnn_health.rss
@@ -110,10 +120,20 @@ https://www.latimes.com/nation/rss2.0.xml
 https://feeds.nbcnews.com/nbcnews/public/health
 https://www.theguardian.com/us/environment/rss
 https://rss.csmonitor.com/feeds/science
+https://www.staradvertiser.com/feed/
+https://www.wdsu.com/topstories-rss
+https://www.wbrz.com/feeds/rssfeed.cfm?category=58&cat_name=News
+https://6abc.com/feed/
+https://www.nbcchicago.com/?rss=y
+https://www.wtae.com/topstories-rss
+https://www.wxyz.com/news.rss
+https://www.wkyc.com/feeds/syndication/rss/news
+https://www.12newsnow.com/feeds/syndication/rss/news/local
+https://abc7news.com/feed/
 """)
     
     keyword_input = st.text_input("Desired Keywords (comma-separated)", 
-                                    value="asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, hazardous materials, environmental accident, industrial fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
+                                    value="environmental cleanup, Emergency environmental response, Environmental remediation, asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, hazardous materials, environmental accident, industrial fire, pipeline release, train derailment, wildland fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
 
 
 rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] 
@@ -133,6 +153,10 @@ st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desire
 
 central = pytz.timezone("America/Chicago")
 
+
+
+
+
 for counter, article in filtered_articles.items(): 
     date_str = article['Date and Time Published']
     try:
@@ -150,3 +174,4 @@ for counter, article in filtered_articles.items():
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
     st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
     st.markdown("---")
+
