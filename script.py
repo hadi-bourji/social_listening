@@ -82,10 +82,13 @@ def get_relevant_articles(articles: list, keywords: list):
                                             )
                        
                         for sentence in sentences:
-                            if pattern.search(sentence):
-                                    if key!="title" and key!="link": 
-                                        highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence)
-                                        matched_context.add(highlighted_sentence.strip())
+                            matched_in_sentence = [kw for kw, pat in keyword_patterns.items() if pat.search(sentence)]
+                            if matched_in_sentence and key not in ("title", "link"):
+                                highlighted_sentence = sentence
+                                for kw in matched_in_sentence:
+                                    highlighted_sentence = keyword_patterns[kw].sub(lambda m: f"**{m.group(0)}**", highlighted_sentence)
+                                matched_context.add(highlighted_sentence.strip())
+
         if not matched_context: 
             matched_context.add("Keyword found only in article title and/or URL.") 
 
@@ -212,7 +215,6 @@ if selected_sort == "Published Date (Newest First)":
             reverse=True
         )
     )
-
 
 if selected_sort == "Keywords (Most)":
     filtered_articles = dict(

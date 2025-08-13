@@ -103,11 +103,15 @@ def get_relevant_articles(articles: list, keywords: list):
                                                 r"(?<!U\.K\.)(?<!vs\.)(?<!etc\.)(?<!i\.e\.)(?<!e\.g\.)(?<=[.!?])(?=\s+)",
                                                 cleaned_value
                                             )                        
-                        for sentence in sentences: #loop through sentences and if the keyword is in a sentence, bold it unless the keyword is found in the link
-                            if pattern.search(sentence):
-                                if key!="title" and key!="link": #dont put the title or the link in keyword context since they are already present at the top
-                                        highlighted_sentence = pattern.sub(lambda m: f"**{m.group(0)}**", sentence) #bold the keyword
-                                        matched_context.add(highlighted_sentence.strip())
+
+                        for sentence in sentences: #loop through split sentences and if the keyword is in a sentence, bold it unless the keyword is found in the link
+                            matched_in_sentence = [kw for kw, pat in keyword_patterns.items() if pat.search(sentence)] #check all keywords in each sentence
+                            if matched_in_sentence and key not in ("title", "link"): #dont put the title or the link in keyword context since they are already present at the top
+                                highlighted_sentence = sentence
+                                for kw in matched_in_sentence:
+                                    highlighted_sentence = keyword_patterns[kw].sub(lambda m: f"**{m.group(0)}**", highlighted_sentence) #bold all the keywords present in the current sentence
+                                matched_context.add(highlighted_sentence.strip())
+
         if not matched_context: #since we're not adding the title or article link to the context, we want to let them know where the keyword was found
             matched_context.add("Keyword found only in article title and/or website link.") #if the keyword is only found in the title and/or article link
 
