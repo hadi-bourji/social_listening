@@ -133,20 +133,15 @@ with st.sidebar:
     selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
     
     st.header("User Inputs:") 
-                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver
-    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, baton rouge, philadelphia
-        value="""https://feeds.nbcnews.com/nbcnews/public/news 
-http://rss.cnn.com/rss/cnn_topstories.rss
-https://moxie.foxnews.com/google-publisher/health.xml
-http://rss.cnn.com/rss/cnn_health.rss
+                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city
+    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia
+        value="""https://feeds.nbcnews.com/nbcnews/public/news
 https://www.wthr.com/feeds/syndication/rss/news/local
 https://ktla.com/news/california/feed/
 https://abc13.com/feed/
 https://www.latimes.com/nation/rss2.0.xml
-https://feeds.nbcnews.com/nbcnews/public/health
 https://www.staradvertiser.com/feed/
 https://www.wdsu.com/topstories-rss
-https://www.wbrz.com/feeds/rssfeed.cfm?category=58&cat_name=News
 https://6abc.com/feed/
 https://www.nbcchicago.com/?rss=y
 https://www.wtae.com/topstories-rss
@@ -155,13 +150,15 @@ https://www.wkyc.com/feeds/syndication/rss/news
 https://www.12newsnow.com/feeds/syndication/rss/news/local
 https://abc7news.com/feed/
 https://www.denver7.com/news/local-news.rss?_ga=2.23544893.620645875.1755100212-144600510.1755100212
+https://hudsonreporter.com/news/jersey-city/feed/
+https://www.pressherald.com/news/feed/
                 """)
-    
+    #U.S., cali, florida, illinois, louisiana, new york, ohio, pennsylvania, texas, washington
     keyword_input = st.text_area(
     "Desired Keywords (one per line)",
     value="""environmental cleanup
-Emergency environmental response
-Environmental remediation
+emergency environmental response
+environmental remediation
 asbestos
 mold
 explosion
@@ -183,6 +180,8 @@ wildland fire
 wildfire
 wildfires
 brush fire
+PFAS
+forever chemicals
 refinery explosion
 asbestos release
 mold outbreak
@@ -193,6 +192,8 @@ CERCLA site release
 TSCA incident
 NTSIP release incident
 EPA envirofacts alert
+earthquakes
+earthquake
 chemical incident"""
 )
 
@@ -264,11 +265,16 @@ if selected_sort == "Keywords (Most)":
 
 c = 1
 for counter, article in filtered_articles.items(): 
-    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True)
     st.markdown(f"**Published:** {article['readable_time']}")
     st.markdown(f"[Read Article]({article['Article Link']})") 
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
-    st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
+
+    context_list = list(article['Context'])
+    if len(context_list) > 3:
+        context_list = context_list[:3]
+    st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(context_list))
+    
     st.markdown("---")
     c+=1
 

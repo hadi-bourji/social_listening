@@ -269,10 +269,15 @@ elif selected_sort == "Keywords (Most)":
 c = 1
 for counter, article in filtered_articles.items():
     st.markdown(f"### {c}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
-    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title eurofins color
     st.markdown(f"**Published:** {article['readable_time']}")
     st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
-    st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
+    
+    context_list = list(article['Context']) #only output the first three context sentences if there are more than three to make it less messy
+    if len(context_list) > 3:
+        context_list = context_list[:3]
+    st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(context_list))
+
     st.markdown("---") #divider
     c+=1
