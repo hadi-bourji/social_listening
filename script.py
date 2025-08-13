@@ -142,7 +142,7 @@ https://www.wxyz.com/news.rss
 https://www.wkyc.com/feeds/syndication/rss/news
 https://www.12newsnow.com/feeds/syndication/rss/news/local
 https://abc7news.com/feed/
-""")
+                """)
     
     keyword_input = st.text_input("Desired Keywords (comma-separated)", 
                                     value="environmental cleanup, Emergency environmental response, Environmental remediation, asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, hazardous materials, environmental accident, industrial fire, pipeline release, train derailment, wildland fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
@@ -180,17 +180,25 @@ tzinfos = {
 
 central = pytz.timezone("America/Chicago")
 for counter, article in filtered_articles.items(): 
-    date_str = article['Date and Time Published']
-    dt_with_tz = parser.parse(date_str, tzinfos=tzinfos)
-    dt_utc = dt_with_tz.astimezone(pytz.UTC)
-    dt_central = dt_utc.astimezone(central)
-    formatted_time = dt_central.strftime("%I:%M %p %Z %m-%d-%Y")
-    article['datetime_obj'] = dt_central
-    article['readable_time'] = formatted_time
+    date_str = article.get('Date and Time Published')
+    if date_str:
+        dt_with_tz = parser.parse(date_str, tzinfos=tzinfos)
+        dt_utc = dt_with_tz.astimezone(pytz.UTC)
+        dt_central = dt_utc.astimezone(central)
+        formatted_time = dt_central.strftime("%I:%M %p %Z %m-%d-%Y")
+        article['datetime_obj'] = dt_central
+        article['readable_time'] = formatted_time
+    else:
+        article['datetime_obj'] = datetime.min
+        article['readable_time'] = "Unknown"
+
+
+
 
 sort_options = [
     "None",
-    "Published Date (Newest First)"
+    "Published Date (Newest First)",
+    "Number of Keywords Matched (Most)"
 ]
 
 selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
@@ -200,6 +208,16 @@ if selected_sort == "Published Date (Newest First)":
         sorted(
             filtered_articles.items(),
             key=lambda item: item[1].get('datetime_obj') or datetime.min,
+            reverse=True
+        )
+    )
+
+
+elif selected_sort == "Keywords (Most)":
+    filtered_articles = dict(
+        sorted(
+            filtered_articles.items(),
+            key=lambda item: len(item[1].get('Matched Keywords', [])),
             reverse=True
         )
     )

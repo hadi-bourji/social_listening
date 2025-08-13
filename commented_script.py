@@ -185,17 +185,22 @@ tzinfos = {
 }
 
 for counter, article in filtered_articles.items(): #loop through the filtered_articles dictionary from our function
-    date_str = article['Date and Time Published'] #pull date and time of publishing for this article
-    dt_with_tz = parser.parse(date_str, tzinfos=tzinfos) #parse date and time with dictionary to avoid parser misunderstanding time zone abbreviations
-    dt_utc = dt_with_tz.astimezone(pytz.UTC) 
-    dt_central = dt_utc.astimezone(central) #convert all time zones to central
-    formatted_time = dt_central.strftime(f"%I:%M %p %Z %m-%d-%Y") #covnvert to readable string
-    article['datetime_obj'] = dt_central #save converted time for sorting
-    article['readable_time'] = formatted_time #save converted and formatted time for outputting for human readability
+    date_str = article.get('Date and Time Published') #pull date and time of publishing for this article
+    if date_str:
+        dt_with_tz = parser.parse(date_str, tzinfos=tzinfos) #parse date and time with dictionary to avoid parser misunderstanding time zone abbreviations
+        dt_utc = dt_with_tz.astimezone(pytz.UTC) 
+        dt_central = dt_utc.astimezone(central) #convert all time zones to central
+        formatted_time = dt_central.strftime(f"%I:%M %p %Z %m-%d-%Y") #covnvert to readable string
+        article['datetime_obj'] = dt_central #save converted time for sorting
+        article['readable_time'] = formatted_time #save converted and formatted time for outputting for human readability
+    else:
+        article['datetime_obj'] = datetime.min #if the rss doesnt have publish date
+        article['readable_time'] = "Unknown"
 
 sort_options = [ #list of sort options for user to choose from, none by default
     "None",
-    "Published Date (Newest First)"
+    "Published Date (Newest First)",
+    "Number of Keywords Matched (Most)"
 ]
 selected_sort = st.sidebar.selectbox("Sort articles by", sort_options) #allow user to pick sorting from a dropdown menu
 
@@ -207,6 +212,16 @@ if selected_sort == "Published Date (Newest First)": #if they choose to sort by 
             reverse=True
         )
     )
+
+elif selected_sort == "Keywords (Most)":
+    filtered_articles = dict(
+        sorted(
+            filtered_articles.items(),
+            key=lambda item: len(item[1].get('Matched Keywords', [])),
+            reverse=True
+        )
+    )
+
 
 c = 1
 for counter, article in filtered_articles.items():
