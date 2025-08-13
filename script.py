@@ -11,7 +11,7 @@ from streamlit_autorefresh import st_autorefresh
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-count = st_autorefresh(interval=40000, limit=None, key="autorefresh")
+count = st_autorefresh(interval=400000, limit=None, key="autorefresh")
 
 def extract_articles(websites: list):
     articles = [] 
@@ -102,7 +102,16 @@ def get_relevant_articles(articles: list, keywords: list):
     return relevant_articles
 
 
-
+def remove_exact_duplicates(d):
+    seen = []
+    unique = {}
+    new_key = 1
+    for key, val in d.items():
+        if val not in seen:
+            seen.append(val)
+            unique[new_key] = val
+            new_key += 1
+    return unique
 
 st.set_page_config(page_title="Incident Feed", layout="wide") 
 
@@ -111,7 +120,7 @@ st.title("Lab & Environmental Emergency News Monitor")
 with st.sidebar: 
     st.header("User Inputs:") 
                                                               #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh
-    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, Los angeles, hawaii, houston, baton rouge, philadelphia
+    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, baton rouge, philadelphia
         value="""https://feeds.nbcnews.com/nbcnews/public/news 
 http://rss.cnn.com/rss/cnn_topstories.rss
 https://moxie.foxnews.com/google-publisher/health.xml
@@ -152,6 +161,8 @@ st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last
     unsafe_allow_html=True)
 
 
+filtered_articles = remove_exact_duplicates(filtered_articles)
+
 st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
 
 
@@ -174,15 +185,36 @@ for counter, article in filtered_articles.items():
     dt_utc = dt_with_tz.astimezone(pytz.UTC)
     dt_central = dt_utc.astimezone(central)
     formatted_time = dt_central.strftime("%I:%M %p %Z %m-%d-%Y")
+    article['datetime_obj'] = dt_central
+    article['readable_time'] = formatted_time
 
+sort_options = [
+    "None",
+    "Published Date (Newest First)"
+]
 
-    st.markdown(f"<h3 style='color:red;'>{counter}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
-    st.markdown(f"**Published:** {formatted_time}")
+selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
+
+if selected_sort == "Published Date (Newest First)":
+    filtered_articles = dict(
+        sorted(
+            filtered_articles.items(),
+            key=lambda item: item[1].get('datetime_obj') or datetime.min,
+            reverse=True
+        )
+    )
+
+c = 1
+for counter, article in filtered_articles.items(): 
+    st.markdown(f"<h3 style='color:red;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"**Published:** {article['readable_time']}")
     st.markdown(f"[Read Article]({article['Article Link']})") 
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
     st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(article['Context']))
     st.markdown("---")
+    c+=1
 
+#autoscroll code (insta scrolls)
 # html_code = f"""
 # <div id="scroll-to-me" style='background: cyan; height=1px;'>hi</div>
 # <script id="{random.randint(1000, 9999)}">
