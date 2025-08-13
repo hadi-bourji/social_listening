@@ -115,6 +115,7 @@ def remove_exact_duplicates(d):
 
 st.set_page_config(page_title="Incident Feed", layout="wide") 
 
+st.image("Eurofins.png", width=500)
 st.title("Lab & Environmental Emergency News Monitor") 
 
 with st.sidebar: 
@@ -157,7 +158,7 @@ with st.spinner("Scanning feeds for relevant articles..."):
 
 
 last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
-st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last updated: {last_updated}</p>",
+st.markdown(f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
     unsafe_allow_html=True)
 
 
@@ -190,7 +191,7 @@ for counter, article in filtered_articles.items():
         article['readable_time'] = formatted_time
     else:
         article['datetime_obj'] = datetime.min
-        article['readable_time'] = "Unknown"
+        article['readable_time'] = "Published Date not Provided in RSS Feed"
 
 
 
@@ -213,7 +214,7 @@ if selected_sort == "Published Date (Newest First)":
     )
 
 
-elif selected_sort == "Keywords (Most)":
+if selected_sort == "Keywords (Most)":
     filtered_articles = dict(
         sorted(
             filtered_articles.items(),
@@ -224,7 +225,7 @@ elif selected_sort == "Keywords (Most)":
 
 c = 1
 for counter, article in filtered_articles.items(): 
-    st.markdown(f"<h3 style='color:red;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
     st.markdown(f"**Published:** {article['readable_time']}")
     st.markdown(f"[Read Article]({article['Article Link']})") 
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
@@ -232,7 +233,7 @@ for counter, article in filtered_articles.items():
     st.markdown("---")
     c+=1
 
-#autoscroll code (insta scrolls)
+#autoscroll code (instantly scrolls to bottom)
 # html_code = f"""
 # <div id="scroll-to-me" style='background: cyan; height=1px;'>hi</div>
 # <script id="{random.randint(1000, 9999)}">

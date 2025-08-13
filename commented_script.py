@@ -163,7 +163,7 @@ with st.spinner("Scanning feeds for relevant articles..."): # when user hits run
 
 
 last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p") #add in last updated time/date
-st.markdown(f"<p style='font-size:24px; font-weight:bold; color:blue;'>Feed last updated: {last_updated}</p>",
+st.markdown(f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
     unsafe_allow_html=True) #write update time and date with larger font size, bolded, and blue to pop out
 
 filtered_articles = remove_exact_duplicates(filtered_articles) #remove any duplicate values from dict
@@ -226,7 +226,7 @@ elif selected_sort == "Keywords (Most)":
 c = 1
 for counter, article in filtered_articles.items():
     st.markdown(f"### {c}. {article['Article Title']}") #output the counter number (key) and the portion of the value that contains each info we want
-    st.markdown(f"<h3 style='color:red;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
+    st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['Article Title']}</h3>", unsafe_allow_html=True) #make article title red
     st.markdown(f"**Published:** {article['readable_time']}")
     st.markdown(f"[Read Article]({article['Article Link']})") #create a hyperlink, user sees the text inside [] and text in () is the link
     st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}") #add in the keyword that was matched for each article and capitalize each keyword
