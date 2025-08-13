@@ -119,11 +119,21 @@ def remove_exact_duplicates(d):
 st.set_page_config(page_title="Incident Feed", layout="wide") 
 
 st.image("Eurofins.png", width=500)
-st.title("Lab & Environmental Emergency News Monitor") 
+
+st.markdown(f"<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental Emergency News Monitor</p>",
+    unsafe_allow_html=True)
 
 with st.sidebar: 
+    sort_options = [
+    "None",
+    "Published Date (Newest First)",
+    "Number of Keywords Matched (Most)"
+]
+
+    selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
+    
     st.header("User Inputs:") 
-                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh
+                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver
     rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, baton rouge, philadelphia
         value="""https://feeds.nbcnews.com/nbcnews/public/news 
 http://rss.cnn.com/rss/cnn_topstories.rss
@@ -134,8 +144,6 @@ https://ktla.com/news/california/feed/
 https://abc13.com/feed/
 https://www.latimes.com/nation/rss2.0.xml
 https://feeds.nbcnews.com/nbcnews/public/health
-https://www.theguardian.com/us/environment/rss
-https://rss.csmonitor.com/feeds/science
 https://www.staradvertiser.com/feed/
 https://www.wdsu.com/topstories-rss
 https://www.wbrz.com/feeds/rssfeed.cfm?category=58&cat_name=News
@@ -146,14 +154,53 @@ https://www.wxyz.com/news.rss
 https://www.wkyc.com/feeds/syndication/rss/news
 https://www.12newsnow.com/feeds/syndication/rss/news/local
 https://abc7news.com/feed/
+https://www.denver7.com/news/local-news.rss?_ga=2.23544893.620645875.1755100212-144600510.1755100212
                 """)
     
-    keyword_input = st.text_input("Desired Keywords (comma-separated)", 
-                                    value="environmental cleanup, Emergency environmental response, Environmental remediation, asbestos, mold, explosion, chemical leak, gas leak, toxic leak, chemical explosion, flammable, chemical spill, toxic release, hazardous material, hazardous materials, environmental accident, industrial fire, pipeline release, train derailment, wildland fire, wildfire, refinery explosion, asbestos release, mold outbreak, mold remediation, asbestos abatement monitoring, superfund site incident, CERCLA site release, TSCA incident, NTSIP release incident, EPA envirofacts alert, chemical incident") 
+    keyword_input = st.text_area(
+    "Desired Keywords (one per line)",
+    value="""environmental cleanup
+Emergency environmental response
+Environmental remediation
+asbestos
+mold
+explosion
+chemical leak
+gas leak
+toxic leak
+chemical explosion
+flammable
+chemical spill
+toxic release
+hazardous material
+hazardous materials
+environmental accident
+industrial fire
+pasture fire
+pipeline release
+train derailment
+wildland fire
+wildfire
+wildfires
+brush fire
+refinery explosion
+asbestos release
+mold outbreak
+mold remediation
+asbestos abatement monitoring
+superfund site incident
+CERCLA site release
+TSCA incident
+NTSIP release incident
+EPA envirofacts alert
+chemical incident"""
+)
+
 
 
 rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] 
-keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] 
+keywords = [kw.strip().lower() for kw in keyword_input.splitlines() if kw.strip()]
+
 
 with st.spinner("Scanning feeds for relevant articles..."): 
     articles = extract_articles(rss_feeds) 
@@ -196,16 +243,6 @@ for counter, article in filtered_articles.items():
         article['datetime_obj'] = datetime.min
         article['readable_time'] = "Published Date not Provided in RSS Feed"
 
-
-
-
-sort_options = [
-    "None",
-    "Published Date (Newest First)",
-    "Number of Keywords Matched (Most)"
-]
-
-selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
 
 if selected_sort == "Published Date (Newest First)":
     filtered_articles = dict(

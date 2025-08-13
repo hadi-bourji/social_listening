@@ -144,22 +144,67 @@ GUI code below using streamlit.
 '''
 st.set_page_config(page_title="Incident Feed", layout="wide") #set title that is shown in browser tab
 
-st.title("Lab & Environmental Emergency News Monitor") #set title shown at top of webpage
+st.image("Eurofins.png", width=500)
+st.markdown(f"<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental Emergency News Monitor</p>",
+    unsafe_allow_html=True) #set title shown at top of webpage
 
 with st.sidebar: #sidebar
+    sort_options = [ #list of sort options for user to choose from, none by default
+    "None",
+    "Published Date (Newest First)",
+    "Number of Keywords Matched (Most)"
+]
+    selected_sort = st.sidebar.selectbox("Sort articles by", sort_options) #allow user to pick sorting from a dropdown menu
+
     st.header("User Inputs:") #header for the sidebar
     
     rss_input = st.text_area("RSS Feed URLs (one per line)",  #creates a field for the web feed url inputs with a couple links put in by default for the user 
         value="""https://feeds.nbcnews.com/nbcnews/public/news
 http://rss.cnn.com/rss/cnn_us.rss""")
     
-    keyword_input = st.text_input("Desired Keywords (comma-separated)", value="lab, fire, explosion, chemical, environmental") #creates a field for the user to input keywords, with a list of default words
-
+    keyword_input = st.text_area(
+    "Desired Keywords (one per line)",
+    value="""environmental cleanup
+Emergency environmental response
+Environmental remediation
+asbestos
+mold
+explosion
+chemical leak
+gas leak
+toxic leak
+chemical explosion
+flammable
+chemical spill
+toxic release
+hazardous material
+hazardous materials
+environmental accident
+industrial fire
+pasture fire
+pipeline release
+train derailment
+wildland fire
+wildfire
+wildfires
+brush fire
+refinery explosion
+asbestos release
+mold outbreak
+mold remediation
+asbestos abatement monitoring
+superfund site incident
+CERCLA site release
+TSCA incident
+NTSIP release incident
+EPA envirofacts alert
+chemical incident"""
+)
 #     run_search = st.button("Run News Scan") #creates a button with text telling the user what the button does
 
 # if run_search: #if the user clicks the button
 rss_feeds = [url.strip() for url in rss_input.strip().splitlines() if url.strip()] #we want to take all the text in the rss_feeds input box, and process them into a list of URLs
-keywords = [kw.strip().lower() for kw in keyword_input.split(",") if kw.strip()] #take all the text in keyword_input input box, split them by comma, if keyword.strip is not empty, append the lowercased keyword
+keywords = [kw.strip().lower() for kw in keyword_input.splitlines() if kw.strip()] #take all the text in keyword_input input box, split them by comma, if keyword.strip is not empty, append the lowercased keyword
 
 with st.spinner("Scanning feeds for relevant articles..."): # when user hits run button give this loading text
     articles = extract_articles(rss_feeds) #then run the two functions to get the relevant articles
@@ -201,12 +246,6 @@ for counter, article in filtered_articles.items(): #loop through the filtered_ar
         article['datetime_obj'] = datetime.min #if the rss doesnt have publish date
         article['readable_time'] = "Unknown"
 
-sort_options = [ #list of sort options for user to choose from, none by default
-    "None",
-    "Published Date (Newest First)",
-    "Number of Keywords Matched (Most)"
-]
-selected_sort = st.sidebar.selectbox("Sort articles by", sort_options) #allow user to pick sorting from a dropdown menu
 
 if selected_sort == "Published Date (Newest First)": #if they choose to sort by newest first, sort the dict by date
     filtered_articles = dict(
