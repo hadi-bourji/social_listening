@@ -127,4 +127,3 @@ Add state-specific filtering for more localized alerts.
 Integrate email/SMS alerts for high-priority incidents.
 
 Store past alerts in a database for historical reference.
-
