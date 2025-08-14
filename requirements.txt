@@ -1,0 +1,5 @@
+streamlit
+feedparser
+pytz
+python-dateutil
+streamlit-autorefresh
