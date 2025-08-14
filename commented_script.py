@@ -127,16 +127,27 @@ def get_relevant_articles(articles: list, keywords: list):
 
     return relevant_articles
 
-#remove duplicate values from filtered articles dictionary
+#remove duplicate values and foreign countries from filtered articles dictionary
 def remove_exact_duplicates(d):
+    exclude_countries = ["france", "spain", "uk", "russia", "ukraine", "germany", "europe", "mexico", "nordic", "spanish", "england"]
+
     seen = []
     unique = {}
     new_key = 1
+
     for key, val in d.items():
+
+        all_text = " ".join(
+            str(v).lower() for v in val.values() if isinstance(v, str)
+        )
+        if any(country in all_text for country in exclude_countries):
+            continue
+
         if val not in seen:
             seen.append(val)
             unique[new_key] = val
             new_key += 1
+
     return unique
 
 '''
@@ -256,7 +267,7 @@ if selected_sort == "Published Date (Newest First)": #if they choose to sort by 
         )
     )
 
-elif selected_sort == "Keywords (Most)":
+if selected_sort == "Keywords (Most)":
     filtered_articles = dict(
         sorted(
             filtered_articles.items(),

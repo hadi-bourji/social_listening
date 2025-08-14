@@ -41,7 +41,7 @@ pip install -r requirements.txt
 Usage
 
 Run the Streamlit app:
-streamlit run app.py
+streamlit run script.py
 
 
 App Workflow
@@ -89,7 +89,7 @@ groundwater contamination
 
 
 File Structure
-app.py                 # Main Streamlit application
+script.py              # Main Streamlit application
 requirements.txt       # Python dependencies
 Eurofins.png           # Logo displayed in app
 README.md              # Documentation

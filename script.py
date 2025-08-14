@@ -90,7 +90,7 @@ def get_relevant_articles(articles: list, keywords: list):
                                 matched_context.add(highlighted_sentence.strip())
 
         if not matched_context: 
-            matched_context.add("Keyword found only in article title and/or URL.") 
+            matched_context.add("Keyword found in article title and/or URL.") 
 
         if matched_keywords: 
             relevant_articles[count] = {
@@ -106,15 +106,27 @@ def get_relevant_articles(articles: list, keywords: list):
 
 
 def remove_exact_duplicates(d):
+    exclude_countries = ["france", "spain", "uk", "russia", "ukraine", "germany", "europe", "mexico", "nordic", "spanish", "england"]
+
     seen = []
     unique = {}
     new_key = 1
+
     for key, val in d.items():
+
+        all_text = " ".join(
+            str(v).lower() for v in val.values() if isinstance(v, str)
+        )
+        if any(country in all_text for country in exclude_countries):
+            continue
+
         if val not in seen:
             seen.append(val)
             unique[new_key] = val
             new_key += 1
+
     return unique
+
 
 st.set_page_config(page_title="Incident Feed", layout="wide") 
 
@@ -133,9 +145,10 @@ with st.sidebar:
     selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
     
     st.header("User Inputs:") 
-                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city
-    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia
+                                                              #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento
+    rss_input = st.text_area("RSS Feed URLs (one per line)",  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas
         value="""https://feeds.nbcnews.com/nbcnews/public/news
+https://moxie.foxnews.com/google-publisher/us.xml
 https://www.wthr.com/feeds/syndication/rss/news/local
 https://ktla.com/news/california/feed/
 https://abc13.com/feed/
@@ -152,16 +165,78 @@ https://abc7news.com/feed/
 https://www.denver7.com/news/local-news.rss?_ga=2.23544893.620645875.1755100212-144600510.1755100212
 https://hudsonreporter.com/news/jersey-city/feed/
 https://www.pressherald.com/news/feed/
+https://www.wmar2news.com/news/local-news.rss
+https://www.wfaa.com/feeds/syndication/rss/news/local
+https://www.kcra.com/topstories-rss
+https://www.theguardian.com/us/environment/rss
                 """)
-    #U.S., cali, florida, illinois, louisiana, new york, ohio, pennsylvania, texas, washington
+
     keyword_input = st.text_area(
     "Desired Keywords (one per line)",
     value="""environmental cleanup
 emergency environmental response
 environmental remediation
+pesticides
+heavy metals
+oil spill
+herbicides
+chromium
+particulate
+solvents
+chemical materials
+ammonia
+chlorine
+cyanide
+arsenic
+phenol
+formaldehyde
+hydrocarbons
+VOC
+volatile organic compounds
+polychlorinated biphenyls
+dioxins
+benzene
+toluene
+Xylene
+Nitric Acid
+Sulfuric Acid
+Hydrochloric Acid
+Alkalis
+Sodium Hydroxide
+Potassium Hydroxide
+Hydrogen Sulfide
+Perchlorates
+PFOA 
+PFOS 
+Hazardous waste
+Industrial accident
+Plant explosion
+Factory fire
+Pipeline leak
+Tanker spill
+Contaminated water
+Groundwater contamination
+Soil contamination
+Air pollution
+Smoke plume
+Dust emission
+Petroleum & Marine
+Diesel spill
+Fuel leak
+Crude oil spill
+Marine pollution
+Offshore rig accident
+Radioactive leak
+Radiation exposure
+Biohazard
+Toxic release
+Odor complaint
+Fume release
+toxic chemicals
 asbestos
 mold
 explosion
+explosions
 chemical leak
 gas leak
 toxic leak
@@ -169,6 +244,7 @@ chemical explosion
 flammable
 chemical spill
 toxic release
+hazardous chemicals
 hazardous material
 hazardous materials
 environmental accident
@@ -176,10 +252,6 @@ industrial fire
 pasture fire
 pipeline release
 train derailment
-wildland fire
-wildfire
-wildfires
-brush fire
 PFAS
 forever chemicals
 refinery explosion
@@ -192,8 +264,6 @@ CERCLA site release
 TSCA incident
 NTSIP release incident
 EPA envirofacts alert
-earthquakes
-earthquake
 chemical incident"""
 )
 
@@ -274,7 +344,7 @@ for counter, article in filtered_articles.items():
     if len(context_list) > 3:
         context_list = context_list[:3]
     st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(context_list))
-    
+
     st.markdown("---")
     c+=1
 
