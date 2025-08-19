@@ -50,9 +50,10 @@ with st.sidebar:
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="")
     extra_rss = [url.strip() for url in extra_rss_input.splitlines() if url.strip()]
     all_rss = default_rss + extra_rss
+    select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
     selected_rss = []
     for feed in all_rss:
-        if st.checkbox(feed, value=True, key=f"rss_{feed}"):
+        if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}"):
             selected_rss.append(feed)
     
     
@@ -153,9 +154,10 @@ with st.sidebar:
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="")
     extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
     all_keywords = default_keywords + extra_keywords
+    select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
     selected_keywords = []
     for kw in all_keywords:
-        if st.checkbox(kw, value=True, key=f"kw_{kw}"):
+        if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}"):
             selected_keywords.append(kw)
 
     
