@@ -21,7 +21,7 @@ with st.sidebar:
 
 
 
-    st.subheader("RSS Feeds (toggle defaults, or add new ones below)")
+    st.subheader("RSS Feeds (toggle defaults or add new feeds below)")
                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas
         "https://feeds.nbcnews.com/nbcnews/public/news",
@@ -58,7 +58,7 @@ with st.sidebar:
     
     
 
-    st.subheader("Keywords (toggle defaults, or add new ones below)")
+    st.subheader("Keywords (toggle defaults or add new keywords below)")
     default_keywords = ["environmental cleanup",
 "emergency environmental response",
 "environmental remediation",
@@ -153,7 +153,7 @@ with st.sidebar:
 "chemical incident"]
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="")
     extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
-    all_keywords = default_keywords + extra_keywords
+    all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
     select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
     selected_keywords = []
     for kw in all_keywords:
