@@ -5,6 +5,8 @@ from dateutil import parser, tz
 from datetime import datetime
 import pytz
 import streamlit as st
+import html
+
 
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
@@ -100,8 +102,31 @@ def get_relevant_articles(articles: list, keywords: list):
     return relevant_articles
 
 
-def remove_exact_duplicates(d):
-    exclude_countries = ["france", "spain", "uk", "russia", "ukraine", "germany", "europe", "mexico", "nordic", "spanish", "england"]
+def remove_exact_duplicates_and_international(d):
+    exclude_countries = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+    "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
+    "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+    "Cameroon", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo",
+    "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+    "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
+    "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece",
+    "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Vatican City", "Honduras", "Hungary", "Iceland", "India",
+    "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati",
+    "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico",
+    "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal",
+    "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan",
+    "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
+    "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino",
+    "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+    "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
+    "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
+    "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", 
+    "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "europe", "nordic", "spanish", "england", "british"
+]
+
+    exclude_countries_norm = [c.lower() for c in exclude_countries]
 
     seen = []
     unique = {}
@@ -110,16 +135,17 @@ def remove_exact_duplicates(d):
     for key, val in d.items():
 
         all_text = " ".join(
-            str(v).lower() for v in val.values() if isinstance(v, str)
+            html.unescape(v).lower().replace("–", "-")
+            for v in val.values() if isinstance(v, str)
         )
-        if any(country in all_text for country in exclude_countries):
+
+        if any(re.search(rf'\b{re.escape(country)}\b', all_text) for country in exclude_countries_norm):
             continue
 
         if val not in seen:
             seen.append(val)
             unique[new_key] = val
             new_key += 1
-
     return unique
 
 
@@ -166,11 +192,11 @@ def display_articles(articles):
         st.markdown(f"[Read Article]({article['Article Link']})") 
         st.markdown(f"**Matched Keyword(s):** {', '.join(kw.capitalize() for kw in article['Matched Keywords'])}")
 
-        context_list = list(article['Context'])
+        context_list = [html.unescape(sentence) for sentence in article['Context']]
+        context_list = list(dict.fromkeys(context_list))   
         if len(context_list) > 3:
             context_list = context_list[:3]
         st.markdown(f"**Keyword Context:**\n\n-" + '\n\n-'.join(context_list))
 
         st.markdown("---")
         c+=1
-

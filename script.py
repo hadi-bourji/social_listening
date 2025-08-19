@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
-from utils.articles import display_articles, convert_articles_to_central, extract_articles, get_relevant_articles, remove_exact_duplicates
+from utils.articles import display_articles, convert_articles_to_central, extract_articles, get_relevant_articles, remove_exact_duplicates_and_international
 
 
 count = st_autorefresh(interval=400000, limit=None, key="autorefresh")
@@ -160,26 +160,18 @@ with st.sidebar:
         if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}"):
             selected_keywords.append(kw)
 
-    
-
     rss_feeds = selected_rss
     keywords = selected_keywords
-
-
-
-  
-
 
 with st.spinner("Scanning feeds for relevant articles..."): 
     articles = extract_articles(rss_feeds) 
     filtered_articles = get_relevant_articles(articles, keywords)
 
-
 last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
 st.markdown(f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
     unsafe_allow_html=True)
 
-filtered_articles = remove_exact_duplicates(filtered_articles)
+filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
 
 st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.") 
 
@@ -204,17 +196,3 @@ if selected_sort == "Keywords (Most)":
     )
 
 display_articles(filtered_articles)
-
-
-#autoscroll code (instantly scrolls to bottom)
-# html_code = f"""
-# <div id="scroll-to-me" style='background: cyan; height=1px;'>hi</div>
-# <script id="{random.randint(1000, 9999)}">
-#    var e = document.getElementById("scroll-to-me");
-#    if (e) {{
-#      e.scrollIntoView({{behavior: "smooth"}});
-#      e.remove();
-#    }}
-# </script>
-# """
-# components.html(html_code)
