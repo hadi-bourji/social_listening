@@ -3,31 +3,39 @@ import ssl
 import re
 from dateutil import parser, tz
 from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
 import pytz
 import streamlit as st
 import html
 
-
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
-def extract_articles(websites: list):
-    articles = [] 
-    for website in websites:
-        feed = feedparser.parse(website) 
-        for entry in feed.entries:
-            article_data = {} 
 
-            for key in ("title", "summary", "link", "published"): 
+def extract_articles(websites: list, max_workers=10):
+    def fetch_and_parse(url):
+        feed = feedparser.parse(url)
+        entries_list = []
+        for entry in feed.entries:
+            article_data = {}
+            for key in ("title", "summary", "link", "published"):
                 if key in entry:
                     article_data[key] = entry[key]
 
-            if "content" in entry and isinstance(entry["content"], list): 
+            if "content" in entry and isinstance(entry["content"], list):
                 content_item = entry["content"][0]
                 if "value" in content_item:
                     article_data["content"] = content_item["value"]
 
-            articles.append(article_data)
+            entries_list.append(article_data)
+        return entries_list
+
+    articles = []
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = executor.map(fetch_and_parse, websites)
+        for feed_articles in results:
+            articles.extend(feed_articles)
+
     return articles
 
 
