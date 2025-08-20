@@ -13,7 +13,7 @@ def replace_tag_with_boundary(match, text):
     else:
         return '. '
     
-def get_relevant_articles(articles: list, keywords: list):
+def get_relevant_articles(articles: list, keywords: list, match_type="OR"):
     relevant_articles = {}
     count = 1
 
@@ -63,14 +63,21 @@ def get_relevant_articles(articles: list, keywords: list):
 
         if not matched_context: 
             matched_context.add("Keyword found in article title and/or URL.") 
+        
+        if match_type == "AND":
+            condition = set(kw.lower() for kw in keywords).issubset(
+                {kw.lower() for kw in matched_keywords}
+            )
+        else: 
+            condition = bool(matched_keywords)
 
-        if matched_keywords: 
+        if condition:
             relevant_articles[count] = {
                 'Article Title': article.get('title'),
                 'Article Link': article.get('link'),
                 'Date and Time Published': article.get('published'),
                 'Matched Keywords': matched_keywords,
-                'Context': matched_context 
+                'Context': matched_context
             }
             count += 1
 

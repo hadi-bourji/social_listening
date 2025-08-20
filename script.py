@@ -17,6 +17,13 @@ with st.sidebar:
     "Published Date (Newest First)",
     "Number of Keywords Matched (Most)"]
     selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
+
+    match_type = st.radio(
+    "Keyword Match Type",
+    ("Match ANY (OR)", "Match ALL (AND)"),
+    index=0
+)
+
     st.header("User Inputs:") 
 
     st.subheader("RSS Feeds (toggle defaults or add new feeds below)")               
@@ -163,7 +170,7 @@ with st.sidebar:
 
 with st.spinner("Scanning feeds for relevant articles..."): 
     articles = extract_articles(rss_feeds) 
-    filtered_articles = get_relevant_articles(articles, keywords)
+    filtered_articles = get_relevant_articles(articles, keywords, match_type="AND" if match_type == "Match ALL (AND)" else "OR")
 
 last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
 st.markdown(f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
