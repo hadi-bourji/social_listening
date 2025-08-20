@@ -1,8 +1,8 @@
 import streamlit as st
-import streamlit.components.v1 as components
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
-from utils.articles import display_articles, convert_articles_to_central, extract_articles, get_relevant_articles, remove_exact_duplicates_and_international
+from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international
+from utils.concurrent import extract_articles
 
 
 count = st_autorefresh(interval=400000, limit=None, key="autorefresh")
@@ -19,9 +19,7 @@ with st.sidebar:
     selected_sort = st.sidebar.selectbox("Sort articles by", sort_options)
     st.header("User Inputs:") 
 
-
-
-    st.subheader("RSS Feeds (toggle defaults or add new feeds below)")
+    st.subheader("RSS Feeds (toggle defaults or add new feeds below)")               
                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas
         "https://feeds.nbcnews.com/nbcnews/public/news",
