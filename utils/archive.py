@@ -30,8 +30,8 @@ def save_articles_to_db(articles):
             article['Article Title'],
             article['Article Link'],
             dt_iso,
-            ",".join(article['Matched Keywords']),
-            " | ".join(article['Context'])
+            ", ".join(sorted(article['Matched Keywords'])),
+            " | ".join(sorted(article['Context']))
         ))
     
     conn.commit()
