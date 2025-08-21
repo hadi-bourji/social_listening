@@ -31,7 +31,7 @@ def save_articles_to_db(articles):
             article['Article Link'],
             dt_iso,
             ", ".join(sorted(article['Matched Keywords'])),
-            " | ".join(sorted(article['Context']))
+            " \n\n ".join(sorted(article['Context']))
         ))
     
     conn.commit()
