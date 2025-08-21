@@ -3,6 +3,7 @@ from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international
 from utils.concurrent import extract_articles
+from utils.archive import *
 
 
 count = st_autorefresh(interval=400000, limit=None, key="autorefresh")
@@ -12,6 +13,7 @@ st.image("Eurofins.png", width=500)
 st.markdown(f"<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental Emergency News Monitor</p>", unsafe_allow_html=True)
 
 with st.sidebar: 
+
     sort_options = [
     "None",
     "Published Date (Newest First)",
@@ -200,4 +202,34 @@ if selected_sort == "Keywords (Most)":
         )
     )
 
-display_articles(filtered_articles)
+#archive
+archive_results = None
+with st.sidebar:
+    st.sidebar.header("Archive Search")
+    keyword_filter = st.sidebar.text_input("Keyword")
+    start_date = st.sidebar.date_input("Start Date")
+    end_date = st.sidebar.date_input("End Date")
+
+    if st.sidebar.button("Search Archive"):
+        archive_results = query_articles(keyword=keyword_filter,
+                                start_date=start_date.strftime("%Y-%m-%d"),
+                                end_date=end_date.strftime("%Y-%m-%d"))
+        st.write(f"Found {len(archive_results)} articles")
+        for article in archive_results:
+            st.markdown(f"**{article[1]}**") 
+            st.markdown(f"[Read Article]({article[2]})")  
+            st.markdown(f"Published: {article[3]}")
+            st.markdown(f"Keywords: {article[4]}")
+            st.markdown(f"Context: {article[5]}")
+            st.markdown("---")
+
+    if st.sidebar.button("Archive Current Results"):
+        if filtered_articles:
+            save_articles_to_db(filtered_articles)
+            st.sidebar.success(f"Archived {len(filtered_articles)} article(s) to the database!")
+        else:
+            st.sidebar.warning("No articles to archive.")
+#archive
+    
+if archive_results is None:
+    display_articles(filtered_articles)
