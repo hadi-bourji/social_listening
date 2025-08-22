@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 import email.utils 
+import html
 
 DB_PATH = "articles.db"
 
@@ -22,6 +23,11 @@ def save_articles_to_db(articles):
     for article in articles.values():
         dt = email.utils.parsedate_to_datetime(article['Date and Time Published'])
         dt_iso = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        context_list = [html.unescape(sentence) for sentence in article['Context']]
+        context_list = list(dict.fromkeys(context_list))   
+        if len(context_list) > 3:
+            context_list = context_list[:3]
         
         c.execute('''
             INSERT OR IGNORE INTO articles (title, link, published, matched_keywords, context)
@@ -31,7 +37,8 @@ def save_articles_to_db(articles):
             article['Article Link'],
             dt_iso,
             ", ".join(sorted(article['Matched Keywords'])),
-            " \n\n ".join(sorted(article['Context']))
+            " \n\n ".join(sorted(context_list))
+            # " \n\n ".join(sorted(article['Context']))
         ))
     
     conn.commit()
