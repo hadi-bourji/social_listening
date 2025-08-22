@@ -112,6 +112,7 @@ def remove_exact_duplicates_and_international(d):
     exclude_countries_norm = [c.lower() for c in exclude_intnl]
 
     seen = []
+    seen_titles = set() 
     unique = {}
     new_key = 1
 
@@ -124,8 +125,13 @@ def remove_exact_duplicates_and_international(d):
 
         if any(re.search(rf'\b{re.escape(country)}\b', all_text) for country in exclude_countries_norm):
             continue
+        
+        title = val.get("Article Title", "").strip().lower()
+        if title in seen_titles:
+            continue
 
         if val not in seen:
+            seen_titles.add(title)
             seen.append(val)
             unique[new_key] = val
             new_key += 1

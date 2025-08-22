@@ -214,7 +214,6 @@ with st.sidebar:
                 st.markdown(f"**{article[1]}**")
                 st.markdown(f"[Read Article]({article[2]})")
                 st.markdown(f"Published: {article[3]}")
-                st.markdown(f"Keywords: {article[4]}")
                 st.markdown(f"Context: {article[5]}")
                 st.markdown("---")
 
