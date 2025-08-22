@@ -48,21 +48,27 @@ def query_articles(keywords=None, start_date=None, end_date=None, archive_match_
     c = conn.cursor()
     query = "SELECT * FROM articles WHERE 1=1"
     params = []
+
     if archive_match_type=="OR":
         if keywords:
             keyword_clauses = []
             for kw in keywords:
-                keyword_clauses.append("LOWER(matched_keywords) LIKE ?")
+                keyword_clauses.append("LOWER(matched_keywords) LIKE ? OR LOWER(title) LIKE ? OR LOWER(context) LIKE ? OR LOWER(link) LIKE ?")
+                params.append(f"%{kw.lower()}%")
+                params.append(f"%{kw.lower()}%")
+                params.append(f"%{kw.lower()}%")
                 params.append(f"%{kw.lower()}%")
             query += " AND (" + " OR ".join(keyword_clauses) + ")"
     elif archive_match_type=="AND":
         if keywords:
             keyword_clauses = []
             for kw in keywords:
-                keyword_clauses.append("LOWER(matched_keywords) LIKE ?")
+                keyword_clauses.append("LOWER(matched_keywords) LIKE ? OR LOWER(title) LIKE ? OR LOWER(context) LIKE ? OR LOWER(link) LIKE ?")
+                params.append(f"%{kw.lower()}%")
+                params.append(f"%{kw.lower()}%")
+                params.append(f"%{kw.lower()}%")
                 params.append(f"%{kw.lower()}%")
             query += " AND (" + " AND ".join(keyword_clauses) + ")"
-
 
     if start_date:
         query += " AND published >= ?"
