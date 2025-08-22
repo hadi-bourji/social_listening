@@ -203,7 +203,7 @@ with st.sidebar:
     if st.button("Search Archive"):
         with st.spinner("Scanning archives for relevant articles..."):
             archive_results = query_articles(
-                keyword=keyword_filter,
+                keywords=[kw.strip() for kw in keyword_filter.split(",") if kw.strip()],
                 start_date = start_date.strftime("%Y-%m-%d 00:00:00"),
                 end_date = end_date.strftime("%Y-%m-%d 23:59:59")
             )

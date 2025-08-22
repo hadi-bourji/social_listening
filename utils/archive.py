@@ -43,17 +43,19 @@ def save_articles_to_db(articles):
     conn.commit()
     conn.close()
 
-
-def query_articles(keyword=None, start_date=None, end_date=None):
+def query_articles(keywords=None, start_date=None, end_date=None):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     query = "SELECT * FROM articles WHERE 1=1"
     params = []
 
-    if keyword:
-        query += " AND LOWER(matched_keywords) LIKE ?"
-        params.append(f"%{keyword.lower()}%")
-    
+    if keywords:
+        keyword_clauses = []
+        for kw in keywords:
+            keyword_clauses.append("LOWER(matched_keywords) LIKE ?")
+            params.append(f"%{kw.lower()}%")
+        query += " AND (" + " OR ".join(keyword_clauses) + ")"
+
     if start_date:
         query += " AND published >= ?"
         params.append(start_date)
@@ -65,3 +67,4 @@ def query_articles(keyword=None, start_date=None, end_date=None):
     results = c.fetchall()
     conn.close()
     return results
+
