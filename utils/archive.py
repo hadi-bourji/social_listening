@@ -38,7 +38,6 @@ def save_articles_to_db(articles):
             dt_iso,
             ", ".join(sorted(article['Matched Keywords'])),
             " \n\n ".join(sorted(context_list))
-            # " \n\n ".join(sorted(article['Context']))
         ))
     
     conn.commit()
