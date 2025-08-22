@@ -85,7 +85,7 @@ def get_relevant_articles(articles: list, keywords: list, match_type="OR"):
 
 
 def remove_exact_duplicates_and_international(d):
-    exclude_countries = [
+    exclude_intnl = [
     "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
     "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia",
     "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
@@ -105,10 +105,11 @@ def remove_exact_duplicates_and_international(d):
     "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden",
     "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
     "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", 
-    "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "europe", "nordic", "spanish", "england", "british"
+    "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "europe", "nordic", "spanish", "england", "british", "london",
+    "paris"
 ]
 
-    exclude_countries_norm = [c.lower() for c in exclude_countries]
+    exclude_countries_norm = [c.lower() for c in exclude_intnl]
 
     seen = []
     unique = {}

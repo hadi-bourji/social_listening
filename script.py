@@ -20,14 +20,13 @@ with st.sidebar:
     selected_sort = st.selectbox("Sort articles by", sort_options)
 
     # RSS Feeds
-    st.subheader("RSS Feeds")
-    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas
+    st.subheader("RSS Feeds") #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
+    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, 
         "https://feeds.nbcnews.com/nbcnews/public/news",
 "https://moxie.foxnews.com/google-publisher/us.xml",
 "https://www.wthr.com/feeds/syndication/rss/news/local",
 "https://ktla.com/news/california/feed/",
 "https://abc13.com/feed/",
-"https://www.latimes.com/nation/rss2.0.xml",
 "https://www.staradvertiser.com/feed/",
 "https://www.wdsu.com/topstories-rss",
 "https://6abc.com/feed/",
@@ -42,7 +41,11 @@ with st.sidebar:
 "https://www.pressherald.com/news/feed/",
 "https://www.wmar2news.com/news/local-news.rss",
 "https://www.wfaa.com/feeds/syndication/rss/news/local",
-"https://www.kcra.com/topstories-rss"
+"https://www.kcra.com/topstories-rss",
+"https://www.wric.com/app-feed",
+"https://www.wral.com/news/rss/142/",
+"https://www.king5.com/feeds/syndication/rss/news/local",
+"https://fox2now.com/news/feed/"
                 ]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="")
     extra_rss = [url.strip() for url in extra_rss_input.splitlines() if url.strip()]
@@ -63,7 +66,6 @@ with st.sidebar:
 "herbicides",
 "chromium",
 "particulate",
-"solvents",
 "chemical materials",
 "ammonia",
 "chlorine",
@@ -73,6 +75,8 @@ with st.sidebar:
 "formaldehyde",
 "hydrocarbons",
 "VOC",
+"toxic gas",
+"gas exposure",
 "volatile organic compounds",
 "polychlorinated biphenyls",
 "dioxins",
@@ -101,10 +105,8 @@ with st.sidebar:
 "Air pollution",
 "Smoke plume",
 "Dust emission",
-"Petroleum & Marine",
 "Diesel spill",
 "Fuel leak",
-"Crude oil spill",
 "Marine pollution",
 "Offshore rig accident",
 "Radioactive leak",
@@ -130,7 +132,6 @@ with st.sidebar:
 "hazardous materials",
 "environmental accident",
 "industrial fire",
-"pasture fire",
 "pipeline release",
 "train derailment",
 "PFAS",
@@ -140,11 +141,6 @@ with st.sidebar:
 "mold outbreak",
 "mold remediation",
 "asbestos abatement monitoring",
-"superfund site incident",
-"CERCLA site release",
-"TSCA incident",
-"NTSIP release incident",
-"EPA envirofacts alert",
 "chemical incident"]    
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="")
     extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
