@@ -154,7 +154,7 @@ with st.sidebar:
 if st.button("Run RSS Feed Search"):
     with st.spinner("Scanning feeds for relevant articles..."):
         articles = extract_articles(selected_rss)
-        filtered_articles = get_relevant_articles(articles, selected_keywords, match_type="AND" if match_type == "Match ALL (AND)" else "OR")
+        filtered_articles = get_relevant_articles(articles, selected_keywords, match_type="AND" if match_type == "Match all (AND)" else "OR")
         filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
         filtered_articles = convert_articles_to_central(filtered_articles)
 
@@ -195,6 +195,7 @@ if filtered_articles:
 # --- Archive Search & Save ---
 with st.sidebar:
     st.header("Archives")
+    archive_match_type = st.radio("Archive Keyword Match Type", ("Match any (OR)", "Match all (AND)"), index=0)
     keyword_filter = st.text_input("Keyword")
     start_date = st.date_input("Start Date")
     end_date = st.date_input("End Date")
@@ -205,7 +206,8 @@ with st.sidebar:
             archive_results = query_articles(
                 keywords=[kw.strip() for kw in keyword_filter.split(",") if kw.strip()],
                 start_date = start_date.strftime("%Y-%m-%d 00:00:00"),
-                end_date = end_date.strftime("%Y-%m-%d 23:59:59")
+                end_date = end_date.strftime("%Y-%m-%d 23:59:59"),
+                archive_match_type="AND" if archive_match_type == "Match all (AND)" else "OR"
             )
             st.write(f"Found {len(archive_results)} articles")
             for article in archive_results:
