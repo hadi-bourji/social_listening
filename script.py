@@ -14,13 +14,14 @@ st.markdown(
 
 # --- Sidebar Inputs ---
 with st.sidebar:
-
+    # RSS Feeds
+    st.header("RSS Feeds", divider="blue") 
+    
     # Sort options
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options)
 
-    # RSS Feeds
-    st.subheader("RSS Feeds") #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
+    #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, 
         "https://feeds.nbcnews.com/nbcnews/public/news",
 "https://moxie.foxnews.com/google-publisher/us.xml",
@@ -194,7 +195,7 @@ if filtered_articles:
 
 # --- Archive Search & Save ---
 with st.sidebar:
-    st.header("Archives")
+    st.header("Archives", divider="blue")
     archive_match_type = st.radio("Archive Keyword Match Type", ("Match any (OR)", "Match all (AND)"), index=0)
     keyword_filter = st.text_input("Keyword")
     start_date = st.date_input("Start Date")
@@ -218,7 +219,7 @@ with st.sidebar:
                 st.markdown("---")
 
     # Archive Current Results
-    if st.button("Archive Current Results"):
+    if st.button("Archive Current News Feed Results"):
         with st.spinner("Archiving current results..."):
             if filtered_articles:
                 save_articles_to_db(filtered_articles)

@@ -85,4 +85,3 @@ def query_articles(keywords=None, start_date=None, end_date=None, archive_match_
     results = c.fetchall()
     conn.close()
     return results
-
