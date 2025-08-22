@@ -63,11 +63,15 @@ def query_articles(keywords=None, start_date=None, end_date=None, archive_match_
         if keywords:
             keyword_clauses = []
             for kw in keywords:
-                keyword_clauses.append("LOWER(matched_keywords) LIKE ? OR LOWER(title) LIKE ? OR LOWER(context) LIKE ? OR LOWER(link) LIKE ?")
-                params.append(f"%{kw.lower()}%")
-                params.append(f"%{kw.lower()}%")
-                params.append(f"%{kw.lower()}%")
-                params.append(f"%{kw.lower()}%")
+                clause = "(" + " OR ".join([
+                "LOWER(matched_keywords) LIKE ?",
+                "LOWER(title) LIKE ?",
+                "LOWER(context) LIKE ?",
+                "LOWER(link) LIKE ?"
+            ]) + ")"
+                keyword_clauses.append(clause)
+                params.extend([f"%{kw.lower()}%"] * 4)
+
             query += " AND (" + " AND ".join(keyword_clauses) + ")"
 
     if start_date:
