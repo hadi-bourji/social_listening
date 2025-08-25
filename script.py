@@ -171,7 +171,7 @@ with tab_full_archive:
     st.subheader("Full Archive Table")
     
     # Fetch all articles from the database
-    all_articles = query_articles()  # Assuming query_articles() with no args fetches everything
+    all_articles = query_articles()  # query_articles() with no args fetches everything
     if all_articles:
         import pandas as pd
         
