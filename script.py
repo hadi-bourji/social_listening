@@ -4,17 +4,13 @@ from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international, update_feed_and_archive
 from utils.run_concurrent import extract_articles
-from utils.archive import *
+from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
 
 
 ensure_articles_table() 
 
-if "auto_update" not in st.session_state:
-    st.session_state["auto_update"] = True
+st_autorefresh(interval=180000, limit=None, key="hourly_refresh")
 
-refresh_triggered = st_autorefresh(interval=180000, limit=None, key="hourly_refresh")
-if refresh_triggered:
-    st.session_state["auto_update"] = True
 # --- Page setup ---
 st.set_page_config(page_title="Incident Feed", layout="wide")
 st.image("Eurofins.png", width=500)
@@ -24,7 +20,8 @@ st.markdown(
 )
 
 # --- Sidebar Inputs ---
-with st.sidebar:
+@st.fragment
+def sidebar_user_inputs():
     # RSS Feeds
     st.header("Search Current RSS Feeds", divider="blue") 
     
@@ -95,15 +92,19 @@ with st.sidebar:
     all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
     select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
     selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
+    return selected_rss,selected_keywords,match_type,selected_sort
+
+with st.sidebar:
+    selected_rss,selected_keywords,match_type,selected_sort = sidebar_user_inputs()
 
 # --- Tabs ---
 tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Search", "Full Archive"])
 # --- RSS Feed Search ---
 with tab_feed:
+
     with st.spinner("Auto-updating feeds and archiving..."):
-        if st.session_state["auto_update"]:
-            update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
-            st.session_state["auto_update"] = False
+        update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
+            
     if st.button("Run RSS Feed Search", key="rss_search"):
         with st.spinner("Scanning feeds for relevant articles..."):
             articles = extract_articles(selected_rss)
@@ -147,40 +148,43 @@ with tab_feed:
 
 # --- Archive Search & Save ---
 with tab_archive:
-    archive_match_type = st.radio(
-        "Archive Keyword Match Type",
-        ("Match any (OR)", "Match all (AND)"),
-        index=0,
-        key="archive_match_type"
-    )
-    keyword_filter = st.text_input("Keyword", key="archive_keyword")
-    start_date = st.date_input("Start Date", key="archive_start_date")
-    end_date = st.date_input("End Date", key="archive_end_date")
-    # Archive Search
-    if st.button("Search Archive", key="archive_search"):
-        with st.spinner("Scanning archives for relevant articles..."):
-            archive_results = query_articles(
-                keywords=[kw.strip() for kw in keyword_filter.split(",") if kw.strip()],
-                start_date=start_date.strftime("%Y-%m-%d 00:00:00"),
-                end_date=end_date.strftime("%Y-%m-%d 23:59:59"),
-                archive_match_type="AND" if archive_match_type == "Match all (AND)" else "OR"
-            )
-            st.write(f"Found {len(archive_results)} articles")
-            for article in archive_results:
-                st.markdown(f"**{article[1]}**")
-                st.markdown(f"[Read Article]({article[2]})")
-                st.markdown(f"Published: {article[3]}")
-                st.markdown(f"Context: {article[5]}")
-                st.markdown("---")
-    # Archive Current Results
-    if st.button("Archive Current News Feed Results", key="archive_save"):
-        with st.spinner("Archiving current results..."):
-            if filtered_articles:
-                new_count = save_articles_to_db(filtered_articles)
-                if new_count>0:
-                    st.success(f"Archived {new_count} article(s) to the database!")
-                else:
-                    st.success(f"No new articles archived.")
+    @st.fragment
+    def search_archive():
+        archive_match_type = st.radio(
+            "Archive Keyword Match Type",
+            ("Match any (OR)", "Match all (AND)"),
+            index=0,
+            key="archive_match_type"
+        )
+        keyword_filter = st.text_input("Keyword", key="archive_keyword")
+        start_date = st.date_input("Start Date", key="archive_start_date")
+        end_date = st.date_input("End Date", key="archive_end_date")
+        # Archive Search
+        if st.button("Search Archive", key="archive_search"):
+            with st.spinner("Scanning archives for relevant articles..."):
+                archive_results = query_articles(
+                    keywords=[kw.strip() for kw in keyword_filter.split(",") if kw.strip()],
+                    start_date=start_date.strftime("%Y-%m-%d 00:00:00"),
+                    end_date=end_date.strftime("%Y-%m-%d 23:59:59"),
+                    archive_match_type="AND" if archive_match_type == "Match all (AND)" else "OR"
+                )
+                st.write(f"Found {len(archive_results)} articles")
+                for article in archive_results:
+                    st.markdown(f"**{article[1]}**")
+                    st.markdown(f"[Read Article]({article[2]})")
+                    st.markdown(f"Published: {article[3]}")
+                    st.markdown(f"Context: {article[5]}")
+                    st.markdown("---")
+        # Archive Current Results
+        if st.button("Archive Current News Feed Results", key="archive_save"):
+            with st.spinner("Archiving current results..."):
+                if filtered_articles:
+                    new_count = save_articles_to_db(filtered_articles)
+                    if new_count>0:
+                        st.success(f"Archived {new_count} article(s) to the database!")
+                    else:
+                        st.success(f"No new articles archived.")
+    search_archive()
 
 #show full archive as a table
 with tab_full_archive:
