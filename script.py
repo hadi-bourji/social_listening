@@ -104,35 +104,39 @@ with tab_feed:
 
     with st.spinner("Auto-updating feeds and archiving..."):
         update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
-            
-    if st.button("Run RSS Feed Search", key="rss_search"):
-        with st.spinner("Scanning feeds for relevant articles..."):
-            articles = extract_articles(selected_rss)
-            filtered_articles = get_relevant_articles(
-                articles, selected_keywords,
-                match_type="AND" if match_type == "Match all (AND)" else "OR"
-            )
-            filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
-            filtered_articles = convert_articles_to_central(filtered_articles)
-            # Sorting
-            if selected_sort == "Published Date (Newest First)":
-                filtered_articles = dict(
-                    sorted(
-                        filtered_articles.items(),
-                        key=lambda item: item[1].get('datetime_obj') or datetime.min,
-                        reverse=True
-                    )
+
+    @st.fragment
+    def rss_search():        
+        if st.button("Run RSS Feed Search", key="rss_search"):
+            with st.spinner("Scanning feeds for relevant articles..."):
+                articles = extract_articles(selected_rss)
+                filtered_articles = get_relevant_articles(
+                    articles, selected_keywords,
+                    match_type="AND" if match_type == "Match all (AND)" else "OR"
                 )
-            elif selected_sort == "Number of Keywords Matched (Most)":
-                filtered_articles = dict(
-                    sorted(
-                        filtered_articles.items(),
-                        key=lambda item: len(item[1].get('Matched Keywords', [])),
-                        reverse=True
+                filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
+                filtered_articles = convert_articles_to_central(filtered_articles)
+                # Sorting
+                if selected_sort == "Published Date (Newest First)":
+                    filtered_articles = dict(
+                        sorted(
+                            filtered_articles.items(),
+                            key=lambda item: item[1].get('datetime_obj') or datetime.min,
+                            reverse=True
+                        )
                     )
-                )
-            # Store in session_state so other buttons can access it
-            st.session_state['filtered_articles'] = filtered_articles
+                elif selected_sort == "Number of Keywords Matched (Most)":
+                    filtered_articles = dict(
+                        sorted(
+                            filtered_articles.items(),
+                            key=lambda item: len(item[1].get('Matched Keywords', [])),
+                            reverse=True
+                        )
+                    )
+                # Store in session_state so other buttons can access it
+                st.session_state['filtered_articles'] = filtered_articles
+            return filtered_articles
+    filtered_articles = rss_search()
     # Load filtered_articles from session_state if it exists
     filtered_articles = st.session_state.get('filtered_articles', None)
 
