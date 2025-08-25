@@ -1,6 +1,4 @@
 import sqlite3
-from datetime import datetime
-import email.utils 
 import html
 
 DB_PATH = "articles.db"
@@ -38,9 +36,8 @@ def save_articles_to_db(articles):
     ''')
     new_articles_count = 0
     for article in articles.values():
-        dt = email.utils.parsedate_to_datetime(article['Date and Time Published'])
-        dt_iso = dt.strftime("%Y-%m-%d %H:%M:%S")
-
+        dt_iso = article['datetime_obj'].strftime("%Y-%m-%d %H:%M:%S")
+        
         context_list = [html.unescape(sentence) for sentence in article['Context']]
         context_list = list(dict.fromkeys(context_list))   
         if len(context_list) > 3:
@@ -62,6 +59,7 @@ def save_articles_to_db(articles):
     conn.commit()
     conn.close()
     return new_articles_count
+
 
 def query_articles(keywords=None, start_date=None, end_date=None, archive_match_type=None):
     conn = sqlite3.connect(DB_PATH)
