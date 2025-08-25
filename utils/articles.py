@@ -4,6 +4,8 @@ import streamlit as st
 import html
 from dateutil import parser, tz
 from datetime import datetime
+from utils.run_concurrent import extract_articles
+from utils.archive import save_articles_to_db
 
 
 def replace_tag_with_boundary(match, text): 
@@ -123,7 +125,7 @@ def remove_exact_duplicates_and_international(d):
             for v in val.values() if isinstance(v, str)
         )
 
-        if any(re.search(rf'\b{re.escape(country)}\b', all_text) for country in exclude_countries_norm):
+        if any(re.search(rf'\b{re.escape(country)}\w*', all_text) for country in exclude_countries_norm):
             continue
         
         title = val.get("Article Title", "").strip().lower()
@@ -189,3 +191,41 @@ def display_articles(articles):
 
         st.markdown("---")
         c+=1
+
+
+def update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort=None):
+    articles = extract_articles(selected_rss)
+    filtered_articles = get_relevant_articles(
+        articles, selected_keywords,
+        match_type="AND" if match_type == "Match all (AND)" else "OR"
+    )
+    filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
+    filtered_articles = convert_articles_to_central(filtered_articles)
+
+    if selected_sort == "Published Date (Newest First)":
+                filtered_articles = dict(
+                    sorted(
+                        filtered_articles.items(),
+                        key=lambda item: item[1].get('datetime_obj') or datetime.min,
+                        reverse=True
+                    )
+                )
+    elif selected_sort == "Number of Keywords Matched (Most)":
+        filtered_articles = dict(
+            sorted(
+                filtered_articles.items(),
+                key=lambda item: len(item[1].get('Matched Keywords', [])),
+                reverse=True
+            )
+        )
+
+    st.session_state['filtered_articles'] = filtered_articles
+    
+    # Archive results
+    if filtered_articles:
+        new_count = save_articles_to_db(filtered_articles)
+        if new_count>0:
+            st.success(f"Archived {new_count} article(s) to the database!")
+        else:
+            st.success(f"No new articles archived.")
+

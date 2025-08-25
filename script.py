@@ -1,9 +1,20 @@
 import streamlit as st
+import pandas as pd
 from datetime import datetime
-from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international
-from utils.concurrent import extract_articles
+from streamlit_autorefresh import st_autorefresh
+from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international, update_feed_and_archive
+from utils.run_concurrent import extract_articles
 from utils.archive import *
 
+
+ensure_articles_table() 
+
+if "auto_update" not in st.session_state:
+    st.session_state["auto_update"] = True
+
+refresh_triggered = st_autorefresh(interval=180000, limit=None, key="hourly_refresh")
+if refresh_triggered:
+    st.session_state["auto_update"] = True
 # --- Page setup ---
 st.set_page_config(page_title="Incident Feed", layout="wide")
 st.image("Eurofins.png", width=500)
@@ -21,7 +32,7 @@ with st.sidebar:
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
 
-    #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
+    #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, 
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
@@ -31,7 +42,7 @@ with st.sidebar:
         "https://www.staradvertiser.com/feed/",
         "https://www.wdsu.com/topstories-rss",
         "https://6abc.com/feed/",
-        "https://www.nbcchicago.com/?rss=y",
+        "https://abc7chicago.com/feed/",
         "https://www.wtae.com/topstories-rss",
         "https://www.wxyz.com/news.rss",
         "https://www.wkyc.com/feeds/syndication/rss/news",
@@ -45,8 +56,7 @@ with st.sidebar:
         "https://www.kcra.com/topstories-rss",
         "https://www.wric.com/app-feed",
         "https://www.wral.com/news/rss/142/",
-        "https://www.king5.com/feeds/syndication/rss/news/local",
-        "https://fox2now.com/news/feed/"
+        "https://www.king5.com/feeds/syndication/rss/news/local"
     ]
     
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
@@ -90,6 +100,10 @@ with st.sidebar:
 tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Search", "Full Archive"])
 # --- RSS Feed Search ---
 with tab_feed:
+    with st.spinner("Auto-updating feeds and archiving..."):
+        if st.session_state["auto_update"]:
+            update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
+            st.session_state["auto_update"] = False
     if st.button("Run RSS Feed Search", key="rss_search"):
         with st.spinner("Scanning feeds for relevant articles..."):
             articles = extract_articles(selected_rss)
@@ -162,10 +176,12 @@ with tab_archive:
     if st.button("Archive Current News Feed Results", key="archive_save"):
         with st.spinner("Archiving current results..."):
             if filtered_articles:
-                save_articles_to_db(filtered_articles)
-                st.success(f"Archived {len(filtered_articles)} article(s) to the database!")
-            else:
-                st.warning("No articles to archive.")
+                new_count = save_articles_to_db(filtered_articles)
+                if new_count>0:
+                    st.success(f"Archived {new_count} article(s) to the database!")
+                else:
+                    st.success(f"No new articles archived.")
+
 #show full archive as a table
 with tab_full_archive:
     st.subheader("Full Archive Table")
@@ -173,8 +189,6 @@ with tab_full_archive:
     # Fetch all articles from the database
     all_articles = query_articles()  # query_articles() with no args fetches everything
     if all_articles:
-        import pandas as pd
-        
         # Convert to DataFrame for table display
         df = pd.DataFrame(all_articles, columns=["ID", "Article Title", "Web Link", "Published Date", "Keyword(s) Matched", "Context"])
         st.dataframe(df, use_container_width=True)

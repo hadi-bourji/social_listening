@@ -5,6 +5,23 @@ import html
 
 DB_PATH = "articles.db"
 
+def ensure_articles_table():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS articles (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            link TEXT UNIQUE,
+            published TEXT,
+            matched_keywords TEXT,
+            context TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+
 def save_articles_to_db(articles):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
@@ -19,7 +36,7 @@ def save_articles_to_db(articles):
             context TEXT
         )
     ''')
-
+    new_articles_count = 0
     for article in articles.values():
         dt = email.utils.parsedate_to_datetime(article['Date and Time Published'])
         dt_iso = dt.strftime("%Y-%m-%d %H:%M:%S")
@@ -39,9 +56,12 @@ def save_articles_to_db(articles):
             ", ".join(sorted(article['Matched Keywords'])),
             " \n\n ".join(sorted(context_list))
         ))
+        if c.rowcount > 0:
+            new_articles_count += 1
     
     conn.commit()
     conn.close()
+    return new_articles_count
 
 def query_articles(keywords=None, start_date=None, end_date=None, archive_match_type=None):
     conn = sqlite3.connect(DB_PATH)
