@@ -6,7 +6,7 @@ from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
 
-random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds)
+random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
 st_autorefresh(interval=random_approx_hour, limit=None, key="hourly_refresh")
 
@@ -27,7 +27,7 @@ with st.sidebar:
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
 
                      #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
-    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, 
+    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
         "https://www.wthr.com/feeds/syndication/rss/news/local",
@@ -162,6 +162,19 @@ with tab_full_archive:
     if all_articles:
         # Convert to DataFrame for table display
         df = pd.DataFrame(all_articles, columns=["ID", "Article Title", "Web Link", "Published Date", "Keyword(s) Matched", "Context"])
-        st.dataframe(df, use_container_width=True)
+        df["Published Date"] = pd.to_datetime(df["Published Date"], errors='coerce')
+        # st.dataframe(df, use_container_width=True)
+        st.data_editor(
+    df,
+    height=2000, 
+    use_container_width=True,
+    hide_index=True,
+    column_config={
+        "Web Link": st.column_config.LinkColumn("Web Link"),
+        "Published Date": st.column_config.DatetimeColumn("Published Date", format="MMM DD, YYYY HH:mm:ss"),
+        "Keyword(s) Matched": st.column_config.TextColumn("Keyword(s) Matched", width="medium"),
+        "Context": st.column_config.TextColumn("Context", width=4500),
+    }
+)
     else:
         st.info("No archived articles found.")
