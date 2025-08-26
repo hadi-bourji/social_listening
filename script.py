@@ -8,7 +8,6 @@ from utils.archive import ensure_articles_table, save_articles_to_db, query_arti
 
 
 ensure_articles_table() 
-
 st_autorefresh(interval=180000, limit=None, key="hourly_refresh")
 
 # --- Page setup ---
@@ -20,7 +19,6 @@ st.markdown(
 )
 
 # --- Sidebar Inputs ---
-@st.fragment
 def sidebar_user_inputs():
     # RSS Feeds
     st.header("Search Current RSS Feeds", divider="blue") 
@@ -29,7 +27,7 @@ def sidebar_user_inputs():
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
 
-    #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle
+                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, 
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
@@ -53,7 +51,8 @@ def sidebar_user_inputs():
         "https://www.kcra.com/topstories-rss",
         "https://www.wric.com/app-feed",
         "https://www.wral.com/news/rss/142/",
-        "https://www.king5.com/feeds/syndication/rss/news/local"
+        "https://www.king5.com/feeds/syndication/rss/news/local",
+        "https://www.stltoday.com/search/?c=news%2Flocal*&d1=&d2=&s=start_time&sd=desc&l=50&f=rss&t=article,html,collection,link,video"
     ]
     
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
@@ -99,6 +98,7 @@ with st.sidebar:
 
 # --- Tabs ---
 tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Search", "Full Archive"])
+
 # --- RSS Feed Search ---
 with tab_feed:
 
@@ -193,7 +193,6 @@ with tab_archive:
 #show full archive as a table
 with tab_full_archive:
     st.subheader("Full Archive Table")
-    
     # Fetch all articles from the database
     all_articles = query_articles()  # query_articles() with no args fetches everything
     if all_articles:
