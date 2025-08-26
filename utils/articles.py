@@ -195,10 +195,7 @@ def display_articles(articles):
 
 def update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort=None):
     articles = extract_articles(selected_rss)
-    filtered_articles = get_relevant_articles(
-        articles, selected_keywords,
-        match_type="AND" if match_type == "Match all (AND)" else "OR"
-    )
+    filtered_articles = get_relevant_articles(articles, selected_keywords,match_type="AND" if match_type == "Match all (AND)" else "OR")
     filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
     filtered_articles = convert_articles_to_central(filtered_articles)
 
@@ -228,4 +225,5 @@ def update_feed_and_archive(selected_rss, selected_keywords, match_type, selecte
             st.success(f"Archived {new_count} article(s) to the database!")
         else:
             st.success(f"No new articles archived.")
+    return filtered_articles
 

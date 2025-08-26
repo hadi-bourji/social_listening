@@ -1,14 +1,14 @@
 import streamlit as st
 import pandas as pd
+import random
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
-from utils.articles import display_articles, convert_articles_to_central, get_relevant_articles, remove_exact_duplicates_and_international, update_feed_and_archive
-from utils.run_concurrent import extract_articles
+from utils.articles import display_articles, update_feed_and_archive
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
 
-
+random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds)
 ensure_articles_table() 
-st_autorefresh(interval=180000, limit=None, key="hourly_refresh")
+st_autorefresh(interval=random_approx_hour, limit=None, key="hourly_refresh")
 
 # --- Page setup ---
 st.set_page_config(page_title="Incident Feed", layout="wide")
@@ -19,10 +19,9 @@ st.markdown(
 )
 
 # --- Sidebar Inputs ---
-def sidebar_user_inputs():
-    # RSS Feeds
-    st.header("Search Current RSS Feeds", divider="blue") 
-    
+with st.sidebar:
+
+    st.header("Search Current RSS Feeds", divider="blue")   
     # Sort options
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
@@ -91,10 +90,7 @@ def sidebar_user_inputs():
     all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
     select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
     selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
-    return selected_rss,selected_keywords,match_type,selected_sort
 
-with st.sidebar:
-    selected_rss,selected_keywords,match_type,selected_sort = sidebar_user_inputs()
 
 # --- Tabs ---
 tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Search", "Full Archive"])
@@ -102,44 +98,12 @@ tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Sea
 # --- RSS Feed Search ---
 with tab_feed:
 
-    with st.spinner("Auto-updating feeds and archiving..."):
-        update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
-
-    @st.fragment
-    def rss_search():        
-        if st.button("Run RSS Feed Search", key="rss_search"):
-            with st.spinner("Scanning feeds for relevant articles..."):
-                articles = extract_articles(selected_rss)
-                filtered_articles = get_relevant_articles(
-                    articles, selected_keywords,
-                    match_type="AND" if match_type == "Match all (AND)" else "OR"
-                )
-                filtered_articles = remove_exact_duplicates_and_international(filtered_articles)
-                filtered_articles = convert_articles_to_central(filtered_articles)
-                # Sorting
-                if selected_sort == "Published Date (Newest First)":
-                    filtered_articles = dict(
-                        sorted(
-                            filtered_articles.items(),
-                            key=lambda item: item[1].get('datetime_obj') or datetime.min,
-                            reverse=True
-                        )
-                    )
-                elif selected_sort == "Number of Keywords Matched (Most)":
-                    filtered_articles = dict(
-                        sorted(
-                            filtered_articles.items(),
-                            key=lambda item: len(item[1].get('Matched Keywords', [])),
-                            reverse=True
-                        )
-                    )
-                # Store in session_state so other buttons can access it
-                st.session_state['filtered_articles'] = filtered_articles
-            return filtered_articles
-    filtered_articles = rss_search()
-    # Load filtered_articles from session_state if it exists
-    filtered_articles = st.session_state.get('filtered_articles', None)
-
+    with st.spinner("Updating feeds and archiving..."):
+        filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
+     
+    if st.button("Run RSS Feed Search", key="rss_search"):
+        pass #when the user clicks the button it does a refresh of the entire script so it will run rss feed search by executing the search and archive function called above
+        
     # Show last updated time if there are articles
     if filtered_articles:
         last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
@@ -163,7 +127,7 @@ with tab_archive:
         keyword_filter = st.text_input("Keyword", key="archive_keyword")
         start_date = st.date_input("Start Date", key="archive_start_date")
         end_date = st.date_input("End Date", key="archive_end_date")
-        # Archive Search
+        # Search Current Archive 
         if st.button("Search Archive", key="archive_search"):
             with st.spinner("Scanning archives for relevant articles..."):
                 archive_results = query_articles(
