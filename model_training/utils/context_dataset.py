@@ -5,9 +5,7 @@ import os
 
 class CONTEXT_DATA(Dataset):
         
-    def __init__(self, data_path: str = "./data/input.txt", mode="train"):
-        self.mode = mode
-
+    def __init__(self, data_path: str = "./data/input.txt"):
         if os.path.isfile(data_path):
             with open(data_path, 'r', encoding='utf-8') as f:
                 self.sentences = [line.strip() for line in f if line.strip()]
