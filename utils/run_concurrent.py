@@ -1,7 +1,6 @@
 import feedparser
 import ssl
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
 if hasattr(ssl, '_create_unverified_context'):
     ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -22,7 +21,7 @@ def fetch_and_parse(url):
         entries_list.append(article_data)
     return entries_list
 
-def extract_articles(websites, max_workers=10):
+def extract_articles(websites, max_workers=7):
     """Fetch articles from multiple websites concurrently using submit."""
     articles = []
     with ThreadPoolExecutor(max_workers=max_workers) as executor:

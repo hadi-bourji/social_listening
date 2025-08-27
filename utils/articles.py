@@ -7,7 +7,6 @@ from datetime import datetime
 from utils.run_concurrent import extract_articles
 from utils.archive import save_articles_to_db
 
-
 def replace_tag_with_boundary(match, text): 
     before = text[:match.start()] 
     if re.search(r'[.!?]"?\s*$', before): 
@@ -82,7 +81,6 @@ def get_relevant_articles(articles: list, keywords: list, match_type="OR"):
                 'Context': matched_context
             }
             count += 1
-
     return relevant_articles
 
 
