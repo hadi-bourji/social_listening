@@ -32,10 +32,9 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
     train_loader = DataLoader(train_data, batch_size, shuffle=True)
     val_loader   = DataLoader(val_data, batch_size, shuffle=False)
 
-
     today = datetime.today()
     date_str = today.strftime("%m-%d_%H")
-    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}"
+    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset3"
 
     model = TextClassifier(dataset.input_dim, hidden_nodes)
     model.train().to(device)
@@ -44,8 +43,8 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
     writer = SummaryWriter(log_dir=f"./logs/{exp_name}")
-    writer.add_text("Hyperparameters", f"num_epochs: {num_epochs}, "
-                                            f"batch_size: {batch_size}")
+    writer.add_text("Hyperparameters", f"num_epochs: {num_epochs}, batch_size: {batch_size}, hidden_nodes: {hidden_nodes}")
+
 
     for epoch in tqdm(range(num_epochs), desc="Training Epochs", unit="epoch"):
         
@@ -77,28 +76,16 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
             running_val_loss += loss.item()
 
 
-            
         train_loss = running_train_loss / len(train_loader)
         val_loss = running_val_loss / len(val_loader)
             
         writer.add_scalar("Total Loss/Train", train_loss, epoch)
         writer.add_scalar("Total Loss/Val", val_loss, epoch)
 
-    # save written table
     torch.save(model.state_dict(), f"model_checkpoints/{exp_name}.pth")
-
-
     writer.close()
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
-    train(
-        num_epochs=100,
-        batch_size=1,
-        device=device,
-        hidden_nodes=64,
-        lr=0.0001,
-        weight_decay=0.0005,
-        model_name="classifier"
-    )
+    train(num_epochs=100, batch_size=1, device=device, hidden_nodes=128, lr=0.0001, weight_decay=0.0005, model_name="classifier")
