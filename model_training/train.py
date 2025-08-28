@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import pickle
 from torch.utils.data import DataLoader
 from utils.context_dataset import CONTEXT_DATA
 from torch.optim import AdamW
@@ -34,7 +35,7 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 
     today = datetime.today()
     date_str = today.strftime("%m-%d_%H")
-    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset3"
+    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset4"
 
     model = TextClassifier(dataset.input_dim, hidden_nodes)
     model.train().to(device)
@@ -84,6 +85,8 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 
     torch.save(model.state_dict(), f"model_checkpoints/{exp_name}.pth")
     writer.close()
+    with open("vectorizer.pkl", "wb") as f:
+        pickle.dump(dataset.vectorizer, f)
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
