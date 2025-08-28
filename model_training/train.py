@@ -8,6 +8,8 @@ from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from datetime import datetime
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 
 class TextClassifier(nn.Module):
@@ -35,7 +37,7 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 
     today = datetime.today()
     date_str = today.strftime("%m-%d_%H")
-    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset4"
+    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset5"
 
     model = TextClassifier(dataset.input_dim, hidden_nodes)
     model.train().to(device)

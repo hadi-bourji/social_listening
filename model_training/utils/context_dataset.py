@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 class CONTEXT_DATA(Dataset):
         
