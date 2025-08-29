@@ -9,6 +9,8 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 - Keyword Filtering – Finds only articles containing specified environmental incident terms.
 - Context Extraction – Shows up to three key sentence excerpts where keywords are found.
 - Duplicate Removal – Removes exact duplicates and filters out international news (non-U.S.).
+- Archive Current Results – Saves the latest fetched articles for historical reference.  
+- Search Archive – Allows searching past articles by keywords and date range.  
 
 ### Sorting Options
 
@@ -24,14 +26,14 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 
 ## Installation
 
-### Clone the Repository:    
+#### Clone the Repository:    
 git clone https://github.com/yourusername/environmental-emergency-monitor.git  
 cd environmental-emergency-monitor  
 
-### Install Dependencies:    
+#### Install Dependencies:    
 pip install -r requirements.txt  
 
-### Run the Streamlit app:  
+#### Run the Streamlit app:  
 streamlit run script.py
 
 
@@ -40,8 +42,8 @@ streamlit run script.py
 
 ### User Inputs
 
-- RSS Feed URLs – One per line, covering your preferred U.S. news sources.
-- Keywords – One per line, describing environmental emergencies to track.
+- RSS Feed URLs – One per line, covering your preferred news sources.
+- Keywords – One per line, describing topics you would like to track.
 
 ### Article Extraction
 
@@ -63,6 +65,27 @@ Lists relevant articles with:
 - Matched Keywords
 - Up to 3 contextual excerpts
 
+### Archive Current Results  
+- Save all currently fetched and filtered articles.  
+- Each archived entry stores:
+  - Title
+  - Published Date
+  - Source
+  - Matched Keywords
+  - Contextual Sentences
+
+### Search Through the Archive  
+- Search archived articles by **keywords**.  
+- Filter articles by **date range** to find incidents between specific start and end dates.  
+- Returns a list of matching articles with:
+  - Title
+  - Published Date
+  - Source
+  - Matched Keywords
+  - Up to 3 contextual sentences
+
+This feature makes it easy to **analyze trends over time**, revisit past incidents, or generate reports for specific environmental hazards.
+
 ## Example Keywords
 
 - oil spill
@@ -77,7 +100,6 @@ Lists relevant articles with:
 
 - script.py              # Main Streamlit application
 - requirements.txt       # Python dependencies
-- Eurofins.png           # Logo displayed in app
 - README.md              # Documentation
 
 ## Key Functions
@@ -102,6 +124,5 @@ pip install -r requirements.txt
 
 ## Future Improvements
 
-- Add state-specific filtering for more localized alerts.
+
 - Integrate email/SMS alerts for high-priority incidents.
-- Store past alerts in a database for historical reference.
