@@ -27,7 +27,7 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 ## Installation
 
 #### Clone the Repository:    
-git clone https://github.com/hadi-bourji/social_listening.git
+git clone https://github.com/hadi-bourji/social_listening.git  
 cd environmental-emergency-monitor  
 
 #### Install Dependencies:    
