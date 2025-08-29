@@ -37,7 +37,7 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 
     today = datetime.today()
     date_str = today.strftime("%m-%d_%H")
-    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset5"
+    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset7"
 
     model = TextClassifier(dataset.input_dim, hidden_nodes)
     model.train().to(device)
@@ -93,4 +93,4 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
-    train(num_epochs=100, batch_size=1, device=device, hidden_nodes=128, lr=0.0001, weight_decay=0.0005, model_name="classifier")
+    train(num_epochs=30, batch_size=1, device=device, hidden_nodes=128, lr=0.0001, weight_decay=0.0005, model_name="classifier")

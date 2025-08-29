@@ -26,8 +26,8 @@ with st.sidebar:
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
 
-                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis
-    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh
+                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn
+    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
         "https://www.wthr.com/feeds/syndication/rss/news/local",
@@ -52,7 +52,9 @@ with st.sidebar:
         "https://www.wral.com/news/rss/142/",
         "https://www.king5.com/feeds/syndication/rss/news/local",
         "https://www.stltoday.com/search/?c=news%2Flocal*&d1=&d2=&s=start_time&sd=desc&l=50&f=rss&t=article,html,collection,link,video",
-        "https://www.9news.com/feeds/syndication/rss/news/local"
+        "https://www.9news.com/feeds/syndication/rss/news/local",
+        "https://brooklyneagle.com/feed/",
+        "https://www.local10.com/arc/outboundfeeds/rss/category/news/local/?outputType=xml"
     ]
     
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
