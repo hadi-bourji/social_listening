@@ -16,6 +16,8 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 - Published Date (Newest First)
 - Number of Keywords Matched (Most)
 
+### Additional Features
+
 - Time Zone Handling – Converts published times to U.S. Central Time.
 - Auto-Refresh – Refreshes the feed periodically to capture new articles.
 - Clean Display – Titles, publish times, source links, matched keywords, and contextual sentences.
