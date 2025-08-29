@@ -24,11 +24,11 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 
 ## Installation
 
-Clone the Repository  
+Clone the Repository:    
 git clone https://github.com/yourusername/environmental-emergency-monitor.git  
 cd environmental-emergency-monitor  
 
-Install Dependencies  
+Install Dependencies:    
 pip install -r requirements.txt  
 
 Run the Streamlit app:
