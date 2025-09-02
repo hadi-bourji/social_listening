@@ -2,10 +2,17 @@ import re
 import pytz
 import streamlit as st
 import html
+import torch
+import pickle
+import os
 from dateutil import parser, tz
 from datetime import datetime
 from utils.run_concurrent import extract_articles
 from utils.archive import save_articles_to_db
+# from model_training.train import TextClassifier
+# from model_training.utils.context_dataset import CONTEXT_DATA
+
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 def replace_tag_with_boundary(match, text): 
     before = text[:match.start()] 
@@ -106,8 +113,7 @@ def remove_exact_duplicates_and_international(d):
     "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
     "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", 
     "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "europe", "nordic", "spanish", "england", "british", "london",
-    "paris"
-]
+    "paris"]
 
     exclude_countries_norm = [c.lower() for c in exclude_intnl]
 
@@ -225,3 +231,43 @@ def update_feed_and_archive(selected_rss, selected_keywords, match_type, selecte
             st.success(f"No new articles archived.")
     return filtered_articles
 
+
+# def ML_filter(filtered_articles):
+
+#     device = "cuda" if torch.cuda.is_available() else "cpu"
+
+#     #pull in dataset object to get size of vocabulary/features to build model input layer and load parameters
+#     dataset = CONTEXT_DATA("./model_training/data/input.txt")
+#     model = TextClassifier(input_dim=dataset.input_dim, hidden_dim=128)
+#     model.load_state_dict(torch.load("./model_training/model_checkpoints/classifier__ep30_bs1_hn_128_lr1e-04_wd5e-04_08-29_10_dataset7.pth", map_location=device))
+#     model.eval().to(device)
+
+#     #load in vectorizer from training since it has the vocabulary words in order 
+#     with open("./model_training/vectorizer.pkl", "rb") as f:
+#         vectorizer = pickle.load(f)
+
+#     filtered_dict = {}
+#     for key, texts in filtered_articles.items():
+#         X = vectorizer.transform(texts).toarray()
+#         X_tensor = torch.tensor(X, dtype=torch.float32).to(device)
+
+#         with torch.no_grad():
+#             outputs = model(X_tensor)
+#             predictions = (outputs > 0.5).long().cpu().numpy()
+
+#         relevant_texts = [text for text, pred in zip(texts, predictions) if pred == 1]
+
+#         if relevant_texts:
+#             filtered_dict[key] = relevant_texts
+
+
+#     for key, val in filtered_articles.items():
+  
+#         title = val.get("Article Title", "").strip().lower()
+
+#         if val not in seen:
+#             seen_titles.add(title)
+#             seen.append(val)
+#             unique[new_key] = val
+#             new_key += 1
+#     return unique
