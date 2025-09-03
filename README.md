@@ -11,6 +11,8 @@ It’s designed to help teams quickly identify incidents like chemical spills, i
 - Duplicate Removal – Removes exact duplicates and filters out international news (non-U.S.).
 - Archive Current Results – Saves the latest fetched articles for historical reference.  
 - Search Archive – Allows searching past articles by keywords and date range.  
+- Optional ML Classifier Mode – Applies a machine learning model after keyword filtering to ensure articles are truly relevant to environmental emergencies.
+
 
 ### Sorting Options
 
@@ -55,6 +57,8 @@ streamlit run script.py
 - Uses regex to match exact keywords (case-insensitive).
 - Captures surrounding sentences for context (up to 3).
 - Removes duplicates and any articles mentioning excluded countries (e.g., France, UK, Russia).
+- Optional ML Classifier Mode – If enabled, articles passing keyword filters are further screened by a trained classifier to reduce false positives.
+
 
 ### Display
 

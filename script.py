@@ -20,7 +20,7 @@ st.markdown(
 )
 
 ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
-st.info("AI mode applies an additional machine learning filter to the articles to ensure relevance.")
+st.info("AI mode applies a machine learning filter to the articles to further ensure relevance.")
 
 # --- Sidebar exclusions ---
 EXCLUDED_RSS_FILE = "excluded_rss.txt"
