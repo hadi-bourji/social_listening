@@ -1,22 +1,25 @@
 import torch
 import pickle
-from train import TextClassifier
-from utils.context_dataset import CONTEXT_DATA
+from model_training.train import TextClassifier
+from model_training.utils.context_dataset import CONTEXT_DATA
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
-def filter(sentences):
+
+base_dir = os.path.dirname(os.path.abspath(__file__))
+vectorizer_path = os.path.join(base_dir, "vectorizer.pkl")
+def ML_filter(sentences):
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     #pull in dataset object to get size of vocabulary/features to build model input layer and load parameters
-    dataset = CONTEXT_DATA("./data/input.txt")
+    dataset = CONTEXT_DATA(f"{base_dir}/data/input.txt")
     model = TextClassifier(input_dim=dataset.input_dim, hidden_dim=128)
-    model.load_state_dict(torch.load("model_checkpoints/classifier__ep30_bs1_hn_128_lr1e-04_wd5e-04_08-29_10_dataset7.pth", map_location=device))
+    model.load_state_dict(torch.load(f"{base_dir}/model_checkpoints/classifier__ep30_bs1_hn_128_lr1e-04_wd5e-04_08-29_10_dataset7.pth", map_location=device))
     model.eval().to(device)
 
     #load in vectorizer from training since it has the vocabulary words in order 
-    with open("vectorizer.pkl", "rb") as f:
+    with open(vectorizer_path, "rb") as f:
         vectorizer = pickle.load(f)
 
     X = vectorizer.transform(sentences).toarray()
@@ -28,9 +31,8 @@ def filter(sentences):
     # print(outputs)  ##good for testing since it shows how confident the model is in its prediction     
     # print(predictions)   
 
-    for sent, pred in zip(sentences, predictions):
-        label = "Relevant article" if pred == 1 else "Not a relevant article"
-        print(f"{label}: {sent}\n")
+    return predictions.flatten().tolist()
+    
 
 
 if __name__ == "__main__":
@@ -67,6 +69,14 @@ if __name__ == "__main__":
              "Ceiling/ceiling tiles/vents soiled with accumulated food debris, grease, dust, or mold-like substance.",
              "'It was just a bang:' Explosion destroys brewpub in Ellwood City",
              "TRINTY COUNTY SHERIFF: 3 dead due to gas leak in Trinity County, bodies recovered",
-             "Beaumont Fire Department responds to gas leak near Fletcher Elementary causing shelter-in-place"
+             "Beaumont Fire Department responds to gas leak near Fletcher Elementary causing shelter-in-place",
+             "Officials say they're are monitoring air quality at local schools because the nearby wildfire is possibly burning hazardous chemicals.",
+             "Company to store 'hazardous materials' in St. Charles' wellhead district",
+             "Firefighters are battling an apartment fire in Reading, Berks County.",
+             "Monarezs lawyers said she refused to rubber-stamp unscientific, reckless directives and fire dedicated health experts.",
+             "Government shutdown looms as Congress returns after monthlong August recess"
              ]
-    filter(sentences)
+    predictions = ML_filter(sentences)
+    for sent, pred in zip(sentences, predictions):
+        label = "Relevant article" if pred == 1 else "Not a relevant article"
+        print(f"{label}: {sent}\n")

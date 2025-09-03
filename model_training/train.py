@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import pickle
 from torch.utils.data import DataLoader
-from utils.context_dataset import CONTEXT_DATA
+from model_training.utils.context_dataset import CONTEXT_DATA
 from torch.optim import AdamW
 from torch.utils.tensorboard import SummaryWriter
 from sklearn.model_selection import train_test_split

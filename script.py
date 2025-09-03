@@ -19,6 +19,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
+st.info("AI mode applies an additional machine learning filter to the articles to ensure relevance.")
+
 # --- Sidebar exclusions ---
 EXCLUDED_RSS_FILE = "excluded_rss.txt"
 EXCLUDED_KEYWORDS_FILE = "excluded_keywords.txt"
@@ -141,7 +144,7 @@ tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Sea
 with tab_feed:
 
     with st.spinner("Updating feeds and archiving..."):
-        filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort)
+        filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
      
     if st.button("Run RSS Feed Search", key="rss_search"):
         pass #when the user clicks the button it does a refresh of the entire script so it will run rss feed search by executing the search and archive function called above
