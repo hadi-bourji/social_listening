@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import random
+import os
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive
@@ -18,6 +19,27 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# --- Sidebar exclusions ---
+EXCLUDED_RSS_FILE = "excluded_rss.txt"
+EXCLUDED_KEYWORDS_FILE = "excluded_keywords.txt"
+
+def load_exclusions(filepath):
+    """Load exclusions from a file (creates file if missing)."""
+    if not os.path.exists(filepath):
+        with open(filepath, "w"): 
+            pass
+    with open(filepath, "r") as f:
+        return {line.strip() for line in f if line.strip()}
+
+def add_to_exclusions(filepath, item):
+    """Append an item to the exclusions file."""
+    with open(filepath, "a") as f:
+        f.write(item + "\n")
+
+excluded_rss = load_exclusions(EXCLUDED_RSS_FILE)
+excluded_keywords = load_exclusions(EXCLUDED_KEYWORDS_FILE)
+
+
 # --- Sidebar Inputs ---
 with st.sidebar:
 
@@ -26,7 +48,7 @@ with st.sidebar:
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
 
-                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn
+                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn, boston
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
@@ -54,15 +76,24 @@ with st.sidebar:
         "https://www.stltoday.com/search/?c=news%2Flocal*&d1=&d2=&s=start_time&sd=desc&l=50&f=rss&t=article,html,collection,link,video",
         "https://www.9news.com/feeds/syndication/rss/news/local",
         "https://brooklyneagle.com/feed/",
-        "https://www.local10.com/arc/outboundfeeds/rss/category/news/local/?outputType=xml"
+        "https://www.local10.com/arc/outboundfeeds/rss/category/news/local/?outputType=xml",
+        "https://www.wcvb.com/topstories-rss"
     ]
-    
+    default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
     extra_rss = [url.strip() for url in extra_rss_input.splitlines() if url.strip()]
     all_rss = default_rss + extra_rss
     select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
     selected_rss = [feed for feed in all_rss if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}")]
 
+    #remove feed sites and add them to exclusion file
+    st.markdown("---")
+    rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
+    if rss_to_remove != "None" and st.button("Delete Feed"):
+        add_to_exclusions(EXCLUDED_RSS_FILE, rss_to_remove)
+        st.success(f"Removed feed: {rss_to_remove}")
+        st.rerun()
+    st.markdown("---")
     # Keywords
     st.subheader("Keywords")
     # Match type
@@ -88,11 +119,19 @@ with st.sidebar:
         "Asbestos Release", "Mold Outbreak", "Mold Remediation", "Asbestos Abatement Monitoring",
         "Chemical Incident"
     ]
+    default_keywords = [kw for kw in default_keywords if kw not in excluded_keywords]
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
     extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
     all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
     select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
     selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
+
+    st.markdown("---")
+    kw_to_remove = st.selectbox("Delete a keyword permanently", ["None"] + default_keywords, key="remove_kw")
+    if kw_to_remove != "None" and st.button("Delete Keyword"):
+        add_to_exclusions(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
+        st.success(f"Removed keyword: {kw_to_remove}")
+        st.rerun()
 
 
 # --- Tabs ---

@@ -59,8 +59,14 @@ if __name__ == "__main__":
              "New EPA data shows PFAS, or forever chemicals, in 200 more drinking water systems nationwide, including Durham and Fayetteville, as NC utilities work to remove them.",
              "In recent years, Maine’s work to combat PFAS has been marked by learning, listening, collaborating and acting decisively.",
              "Mold. Mold. Mold.’ Former Cedar Point workers describe dorm conditions, park pushes back",
-             "Former employees allege years of mold complaints in Cedar Point dorms, while health officials and the park say inspections show no current issues."
-
-             
+             "Former employees allege years of mold complaints in Cedar Point dorms, while health officials and the park say inspections show no current issues.",
+             "Video shows explosion, fire that destroyed Mass. home",
+             "Roaches to risky tuna! 5 South Florida restaurants were ordered shut",
+             "Food-contact surface soiled with food debris, mold-like substance or slime.",
+             "Observed DM working with chlorine sanitizer with 0 ppm.",
+             "Ceiling/ceiling tiles/vents soiled with accumulated food debris, grease, dust, or mold-like substance.",
+             "'It was just a bang:' Explosion destroys brewpub in Ellwood City",
+             "TRINTY COUNTY SHERIFF: 3 dead due to gas leak in Trinity County, bodies recovered",
+             "Beaumont Fire Department responds to gas leak near Fletcher Elementary causing shelter-in-place"
              ]
     filter(sentences)
