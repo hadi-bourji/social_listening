@@ -14,8 +14,8 @@ def ML_filter(sentences):
 
     #pull in dataset object to get size of vocabulary/features to build model input layer and load parameters
     dataset = CONTEXT_DATA(f"{base_dir}/data/input.txt")
-    model = TextClassifier(input_dim=dataset.input_dim, hidden_dim=128)
-    model.load_state_dict(torch.load(f"{base_dir}/model_checkpoints/classifier__ep30_bs1_hn_128_lr1e-04_wd5e-04_08-29_10_dataset7.pth", map_location=device))
+    model = TextClassifier(input_dim=dataset.input_dim, hidden_dim=256)
+    model.load_state_dict(torch.load(f"{base_dir}/model_checkpoints/classifier__ep33_bs1_hn_256_lr1e-04_wd5e-04_09-04_15_dataset15_1.pth", map_location=device))
     model.eval().to(device)
 
     #load in vectorizer from training since it has the vocabulary words in order 
@@ -74,7 +74,13 @@ if __name__ == "__main__":
              "Company to store 'hazardous materials' in St. Charles' wellhead district",
              "Firefighters are battling an apartment fire in Reading, Berks County.",
              "Monarezs lawyers said she refused to rubber-stamp unscientific, reckless directives and fire dedicated health experts.",
-             "Government shutdown looms as Congress returns after monthlong August recess"
+             "Government shutdown looms as Congress returns after monthlong August recess",
+             "Minneapolis church shooting capped bloody 24 hours as liberal policies fueled crime ‘explosion’: expert",
+             "Following the post-George Floyd uprising in 2020, Minneapolis experienced an explosion in violent crime, including murder, robbery and carjackings, Zimmer explained.",
+             "An 84-year-old woman was killed after a fire broke out inside of a home due to a suspected explosion set off by a propane gas leak, officials said Tuesday.",
+             "CBP seizes fake Labubu dolls valued at over $500K and disguised as light bulbs at Seattle airport",
+             "Some have also been found to contain hazardous chemicals."
+
              ]
     predictions = ML_filter(sentences)
     for sent, pred in zip(sentences, predictions):

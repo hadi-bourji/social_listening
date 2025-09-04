@@ -26,7 +26,7 @@ class TextClassifier(nn.Module):
 
 def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_name):
 
-    dataset = CONTEXT_DATA("./data/input.txt")
+    dataset = CONTEXT_DATA("model_training/data/input.txt")
 
     train_idx, val_idx = train_test_split(list(range(len(dataset))), test_size=0.2, random_state=1)
     train_data = torch.utils.data.Subset(dataset, train_idx)
@@ -37,7 +37,7 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
 
     today = datetime.today()
     date_str = today.strftime("%m-%d_%H")
-    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset7"
+    exp_name = f"{model_name}__ep{num_epochs}_bs{batch_size}_hn_{hidden_nodes}_lr{lr:.0e}_wd{weight_decay:.0e}_{date_str}_dataset15_1"
 
     model = TextClassifier(dataset.input_dim, hidden_nodes)
     model.train().to(device)
@@ -45,7 +45,7 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
     loss_fn = nn.BCELoss()
     optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    writer = SummaryWriter(log_dir=f"./logs/{exp_name}")
+    writer = SummaryWriter(log_dir=f"model_training/logs/{exp_name}")
     writer.add_text("Hyperparameters", f"num_epochs: {num_epochs}, batch_size: {batch_size}, hidden_nodes: {hidden_nodes}")
 
 
@@ -85,12 +85,12 @@ def train(num_epochs, batch_size, device, hidden_nodes, lr, weight_decay, model_
         writer.add_scalar("Total Loss/Train", train_loss, epoch)
         writer.add_scalar("Total Loss/Val", val_loss, epoch)
 
-    torch.save(model.state_dict(), f"model_checkpoints/{exp_name}.pth")
+    torch.save(model.state_dict(), f"model_training/model_checkpoints/{exp_name}.pth")
     writer.close()
-    with open("vectorizer.pkl", "wb") as f:
+    with open("model_training/vectorizer.pkl", "wb") as f:
         pickle.dump(dataset.vectorizer, f)
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
-    train(num_epochs=30, batch_size=1, device=device, hidden_nodes=128, lr=0.0001, weight_decay=0.0005, model_name="classifier")
+    train(num_epochs=33, batch_size=1, device=device, hidden_nodes=256, lr=0.0001, weight_decay=0.0005, model_name="classifier")
