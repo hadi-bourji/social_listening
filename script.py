@@ -50,7 +50,7 @@ with st.sidebar:
     # Sort options
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
-
+                     #wichita-kansas, st louis, 
                      #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn, boston
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami
         "https://feeds.nbcnews.com/nbcnews/public/news",
@@ -80,7 +80,9 @@ with st.sidebar:
         "https://www.9news.com/feeds/syndication/rss/news/local",
         "https://brooklyneagle.com/feed/",
         "https://www.local10.com/arc/outboundfeeds/rss/category/news/local/?outputType=xml",
-        "https://www.wcvb.com/topstories-rss"
+        "https://www.wcvb.com/topstories-rss",
+        "https://www.ksn.com/news/local/feed/",
+        "https://fox2now.com/news/feed/"
     ]
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")

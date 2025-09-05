@@ -110,7 +110,7 @@ def remove_exact_duplicates_and_international(d):
     "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago",
     "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", 
     "Vanuatu", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe", "europe", "nordic", "spanish", "england", "british", "london",
-    "paris"]
+    "paris", "senior discount"]
 
     exclude_countries_norm = [c.lower() for c in exclude_intnl]
 
