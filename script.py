@@ -82,7 +82,8 @@ with st.sidebar:
         "https://www.local10.com/arc/outboundfeeds/rss/category/news/local/?outputType=xml",
         "https://www.wcvb.com/topstories-rss",
         "https://www.ksn.com/news/local/feed/",
-        "https://fox2now.com/news/feed/"
+        "https://fox2now.com/news/feed/",
+        "https://www.wbbjtv.com/feed/"
     ]
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
@@ -122,7 +123,7 @@ with st.sidebar:
         "Hazardous Material", "Hazardous Materials", "Environmental Accident", "Industrial Fire",
         "Pipeline Release", "Train Derailment", "PFAS", "Forever Chemicals", "Refinery Explosion",
         "Asbestos Release", "Mold Outbreak", "Mold Remediation", "Asbestos Abatement Monitoring",
-        "Chemical Incident"
+        "Chemical Incident", "Hazmat", "Environmental Hazards", "Environmental Hazard"
     ]
     default_keywords = [kw for kw in default_keywords if kw not in excluded_keywords]
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
