@@ -3,6 +3,7 @@ import pandas as pd
 import random
 import os
 from datetime import datetime
+import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
@@ -155,7 +156,8 @@ with tab_feed:
         
     # Show last updated time if there are articles
     if filtered_articles:
-        last_updated = datetime.now().strftime("%B %d, %Y at %I:%M:%S %p")
+        tz = pytz.timezone("America/Chicago")
+        last_updated = datetime.now(tz).strftime("%B %d, %Y at %I:%M:%S %p")
         st.markdown(
             f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
             unsafe_allow_html=True
