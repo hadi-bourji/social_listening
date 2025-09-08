@@ -52,7 +52,7 @@ with st.sidebar:
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
                      #wichita-kansas, st louis, 
                      #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn, boston
-    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami
+    default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami, tristate area
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
         "https://www.wthr.com/feeds/syndication/rss/news/local",
@@ -83,7 +83,8 @@ with st.sidebar:
         "https://www.wcvb.com/topstories-rss",
         "https://www.ksn.com/news/local/feed/",
         "https://fox2now.com/news/feed/",
-        "https://www.wbbjtv.com/feed/"
+        "https://www.wbbjtv.com/feed/",
+        "https://www.tristatehomepage.com/feed/"
     ]
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
@@ -119,11 +120,11 @@ with st.sidebar:
         "Offshore Rig Accident", "Radioactive Leak", "Radiation Exposure", "Biohazard",
         "Toxic Release", "Odor Complaint", "Fume Release", "Toxic Chemicals", "Asbestos",
         "Mold", "Explosion", "Explosions", "Chemical Leak", "Gas Leak", "Toxic Leak",
-        "Chemical Explosion", "Flammable", "Chemical Spill", "Hazardous Chemicals",
+        "Chemical Explosion", "Chemical Spill", "Hazardous Chemicals",
         "Hazardous Material", "Hazardous Materials", "Environmental Accident", "Industrial Fire",
         "Pipeline Release", "Train Derailment", "PFAS", "Forever Chemicals", "Refinery Explosion",
         "Asbestos Release", "Mold Outbreak", "Mold Remediation", "Asbestos Abatement Monitoring",
-        "Chemical Incident", "Hazmat", "Environmental Hazards", "Environmental Hazard"
+        "Chemical Incident", "Hazmat", "Environmental Hazards", "Environmental Hazard", "Chemical Fire"
     ]
     default_keywords = [kw for kw in default_keywords if kw not in excluded_keywords]
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
