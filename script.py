@@ -152,7 +152,7 @@ with tab_feed:
         filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
      
     if st.button("Run RSS Feed Search", key="rss_search"):
-        pass #when the user clicks the button it does a refresh of the entire script so it will run rss feed search by executing the search and archive function called above
+        pass #when the user clicks the button it refreshes the entire script so it will run rss feed search by executing the search and archive function called above
         
     # Show last updated time if there are articles
     if filtered_articles:
