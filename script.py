@@ -120,7 +120,7 @@ with st.sidebar:
         "Dust Emission", "Diesel Spill", "Fuel Leak", "Marine Pollution",
         "Offshore Rig Accident", "Radioactive Leak", "Radiation Exposure", "Biohazard",
         "Toxic Release", "Odor Complaint", "Fume Release", "Toxic Chemicals", "Asbestos",
-        "Mold", "Explosion", "Explosions", "Chemical Leak", "Gas Leak", "Toxic Leak",
+        "Explosion", "Explosions", "Chemical Leak", "Gas Leak", "Toxic Leak",
         "Chemical Explosion", "Chemical Spill", "Hazardous Chemicals",
         "Hazardous Material", "Hazardous Materials", "Environmental Accident", "Industrial Fire",
         "Pipeline Release", "Train Derailment", "PFAS", "Forever Chemicals", "Refinery Explosion",
