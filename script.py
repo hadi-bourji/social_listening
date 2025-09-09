@@ -110,7 +110,7 @@ with st.sidebar:
         "Environmental Cleanup", "Emergency Environmental Response", "Environmental Remediation",
         "Pesticides", "Heavy Metals", "Oil Spill", "Herbicides", "Chromium", "Particulate",
         "Chemical Materials", "Ammonia", "Chlorine", "Cyanide", "Arsenic", "Phenol",
-        "Formaldehyde", "Hydrocarbons", "VOC", "Toxic Gas", "Gas Exposure",
+        "Hydrocarbons", "VOC", "Toxic Gas", "Gas Exposure",
         "Volatile Organic Compounds", "Polychlorinated Biphenyls", "Dioxins", "Benzene",
         "Toluene", "Xylene", "Nitric Acid", "Sulfuric Acid", "Hydrochloric Acid", "Alkalis",
         "Sodium Hydroxide", "Potassium Hydroxide", "Hydrogen Sulfide", "Perchlorates",
