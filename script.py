@@ -94,7 +94,7 @@ with st.sidebar:
     select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
     selected_rss = [feed for feed in all_rss if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}")]
 
-    #remove feed sites and add them to exclusion file
+    #remove feed sites and add to exclusion file
     st.markdown("---")
     rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
     if rss_to_remove != "None" and st.button("Delete Feed"):
