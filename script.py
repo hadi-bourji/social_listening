@@ -108,7 +108,7 @@ with st.sidebar:
     match_type = st.radio("Keyword Match Type", ("Match any (OR)", "Match all (AND)"), index=0, key="match_type")
     default_keywords = [
         "Environmental Cleanup", "Emergency Environmental Response", "Environmental Remediation",
-        "Pesticides", "Heavy Metals", "Oil Spill", "Herbicides", "Chromium", "Particulate",
+        "Pesticides", "Oil Spill", "Herbicides", "Chromium", "Particulate",
         "Chemical Materials", "Ammonia", "Chlorine", "Cyanide", "Arsenic", "Phenol",
         "Hydrocarbons", "VOC", "Toxic Gas", "Gas Exposure",
         "Volatile Organic Compounds", "Polychlorinated Biphenyls", "Dioxins", "Benzene",
