@@ -7,6 +7,7 @@ import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
+from utils.web_scraper import pacelabs_scraper, epa_scraper
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
@@ -20,8 +21,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
-st.info("AI mode applies a machine learning filter to help improve article relevance.")
+
 
 # --- Sidebar exclusions ---
 EXCLUDED_RSS_FILE = "excluded_rss.txt"
@@ -143,10 +143,13 @@ with st.sidebar:
 
 
 # --- Tabs ---
-tab_feed, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Archive Search", "Full Archive"])
+tab_feed, tab_press_release, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Press Releases", "Archive Search", "Full Archive"])
 
 # --- RSS Feed Search ---
 with tab_feed:
+
+    ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
+    st.info("AI mode applies a machine learning filter to help improve article relevance.")
 
     with st.spinner("Updating feeds and archiving..."):
         filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
@@ -164,6 +167,30 @@ with tab_feed:
         )
         st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.")
         display_articles(filtered_articles)
+
+with tab_press_release:
+    st.markdown("<p style='font-size:48px; font-weight:bold; color:#003883;'>United States Environmental Protection Agency (EPA)</p>", unsafe_allow_html=True)
+    epa_articles = epa_scraper()
+    c = 1
+    for article in epa_articles:
+            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"**Published:** {article['date']}")
+            st.markdown(f"[Read Article]({article['url']})") 
+            st.markdown(f"**Description:** {article['description']}")
+
+            st.markdown("---")
+            c+=1
+    pacelabs_articles = pacelabs_scraper()
+    c = 1
+    for article in pacelabs_articles:
+            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"**Published:** {article['date']}")
+            st.markdown(f"[Read Article]({article['url']})") 
+            st.markdown(f"**Description:** {article['description']}")
+
+            st.markdown("---")
+            c+=1
+
 
 # --- Archive Search & Save ---
 with tab_archive:

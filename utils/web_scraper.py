@@ -21,7 +21,6 @@ def epa_scraper():
         description = " ".join(descriptions) if descriptions else "No description available"
         url = link_elem.get_attribute("href")
 
-        # print(f"{date} - {title}\nURL: {url}\n{description}\n")
         articles.append({
         "title": title,
         "date": date,
@@ -33,6 +32,7 @@ def epa_scraper():
 
 
 def pacelabs_scraper():
+    # Scrapes pacelabs press release site. Returns each article title, date published, description, and the article URL.
     driver = webdriver.Chrome()
     driver.get("https://www.pacelabs.com/company/press-releases-and-articles/")
     
@@ -67,8 +67,7 @@ def pacelabs_scraper():
 
 
 if __name__ == "__main__":
-    articles = epa_scraper()
+    # articles = epa_scraper()
     articles = pacelabs_scraper()
     for article in articles:
-        print(f"Title: {article['title']}\nPublished Date: {article['date']}\nURL: {article['url']}\n{article['description']}\n")
-    
+        print(f"Title: {article['title']}\nPublished Date: {article['date']}\nURL: {article['url']}\nDescription: {article['description']}\n")
