@@ -6,7 +6,7 @@ from datetime import datetime
 import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive, parse_date
-from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
+from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
 from utils.web_scraper import pacelabs_scraper, epa_scraper
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
@@ -185,6 +185,7 @@ with tab_press_release:
 
                 st.markdown("---")
                 c+=1
+                save_press_releases_to_db([article])
     st.markdown("<p style='font-size:48px; font-weight:bold; color:#003883;'>Pace Labs</p>", unsafe_allow_html=True)        
     pacelabs_articles = pacelabs_scraper()
     c = 1
@@ -198,6 +199,7 @@ with tab_press_release:
 
                 st.markdown("---")
                 c+=1
+                save_press_releases_to_db([article])
 
 
 # --- Archive Search & Save ---

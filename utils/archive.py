@@ -1,5 +1,6 @@
 import sqlite3
 import html
+from datetime import datetime
 
 DB_PATH = "articles.db"
 
@@ -103,3 +104,45 @@ def query_articles(keywords=None, start_date=None, end_date=None, archive_match_
     results = c.fetchall()
     conn.close()
     return results
+
+
+def save_press_releases_to_db(articles):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS articles (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            link TEXT UNIQUE,  -- unique constraint
+            published TEXT,
+            matched_keywords TEXT,
+            context TEXT
+        )
+    ''')
+    
+    new_articles_count = 0
+    for article in articles:
+        try:
+            dt_obj = datetime.strptime(article['date'], "%B %d, %Y")
+            dt_iso = dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            dt_iso = None 
+        
+        c.execute('''
+            INSERT OR IGNORE INTO articles (title, link, published, matched_keywords, context)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (
+             f"Press Release: {article['title']}",
+            article['url'],
+            dt_iso,
+            "",
+            article['description']
+
+        ))
+        if c.rowcount > 0:
+            new_articles_count += 1
+    
+    conn.commit()
+    conn.close()
+    return new_articles_count
