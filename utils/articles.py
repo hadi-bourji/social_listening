@@ -245,3 +245,23 @@ def update_feed_and_archive(selected_rss, selected_keywords, match_type, selecte
         else:
             st.success(f"No new articles archived.")
     return filtered_articles
+
+def parse_date(date_str):
+
+    date_str = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
+
+    formats = [
+        "%B %d, %Y",   # September 12, 2024
+        "%b %d, %Y",   # Sep 12, 2024
+        "%B %Y",       # September 2024
+        "%b %Y",       # Sep 2024
+        "%m/%d/%Y",    # 09/12/2024
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_str, fmt).date()
+        except ValueError:
+            continue
+
+    return None 

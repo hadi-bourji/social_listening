@@ -5,7 +5,7 @@ import os
 from datetime import datetime
 import pytz
 from streamlit_autorefresh import st_autorefresh
-from utils.articles import display_articles, update_feed_and_archive
+from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles
 from utils.web_scraper import pacelabs_scraper, epa_scraper
 
@@ -20,8 +20,6 @@ st.markdown(
     "<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental Emergency News Monitor</p>",
     unsafe_allow_html=True
 )
-
-
 
 # --- Sidebar exclusions ---
 EXCLUDED_RSS_FILE = "excluded_rss.txt"
@@ -168,28 +166,38 @@ with tab_feed:
         st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.")
         display_articles(filtered_articles)
 
+
+
 with tab_press_release:
+    st.markdown("### Filter by Date Range")
+    start_date, end_date = st.date_input("Select date range:", value=[datetime(2025, 1, 1).date(), datetime.today().date()])
+
     st.markdown("<p style='font-size:48px; font-weight:bold; color:#003883;'>United States Environmental Protection Agency (EPA)</p>", unsafe_allow_html=True)
     epa_articles = epa_scraper()
     c = 1
     for article in epa_articles:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+            article_date = parse_date(article['date'])
+            if article_date and start_date <= article_date <= end_date:
+                st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+                st.markdown(f"**Published:** {article['date']}")
+                st.markdown(f"[Read Article]({article['url']})") 
+                st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
+                st.markdown("---")
+                c+=1
+    st.markdown("<p style='font-size:48px; font-weight:bold; color:#003883;'>Pace Labs</p>", unsafe_allow_html=True)        
     pacelabs_articles = pacelabs_scraper()
     c = 1
     for article in pacelabs_articles:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+            article_date = parse_date(article['date'])
+            if article_date and start_date <= article_date <= end_date:
+                st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+                st.markdown(f"**Published:** {article['date']}")
+                st.markdown(f"[Read Article]({article['url']})") 
+                st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
+                st.markdown("---")
+                c+=1
 
 
 # --- Archive Search & Save ---

@@ -2,10 +2,13 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 
 def epa_scraper():
     # Scrapes EPA press release site. Returns each article title, date published, description, and the article URL.
-    driver = webdriver.Chrome()
+    options = Options()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(options=options)
     driver.get("https://www.epa.gov/newsreleases/search")
 
     news_items = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "li.usa-collection__item")))
@@ -33,7 +36,9 @@ def epa_scraper():
 
 def pacelabs_scraper():
     # Scrapes pacelabs press release site. Returns each article title, date published, description, and the article URL.
-    driver = webdriver.Chrome()
+    options = Options()
+    options.add_argument("--headless=new")
+    driver = webdriver.Chrome(options=options)
     driver.get("https://www.pacelabs.com/company/press-releases-and-articles/")
     
     wrapper = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.uc_post_grid_style_one_wrap.ue_post_grid.uc-items-wrapper")))
