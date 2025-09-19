@@ -71,8 +71,61 @@ def pacelabs_scraper():
     return articles
 
 
+def sgs_news_scraper():
+    options = Options()
+    options.add_argument("--headless=new")
+    #sgs was detecting a bot, make the browser look more human
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                     "AppleWebKit/537.36 (KHTML, like Gecko) "
+                     "Chrome/122.0.0.0 Safari/537.36")
+    driver = webdriver.Chrome(options=options)
+
+    driver.get("https://www.sgs.com/en/news")
+
+    # Wait for all article anchors
+    news_items = WebDriverWait(driver, 15).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.m-result-item-filtered-list"))
+    )
+    # Wait for text content to be populated
+    WebDriverWait(driver, 10).until(
+        lambda driver: driver.find_elements(By.CSS_SELECTOR, "h2.m-result-item-filtered-list__headline")[0].text.strip() != ""
+    )            
+
+    articles = []
+    for item in news_items:
+
+        title_element = item.find_element(By.CSS_SELECTOR, "h2.m-result-item-filtered-list__headline")
+        title = title_element.text.strip() or title_element.get_attribute("textContent").strip()
+        
+        description_element = item.find_element(By.CSS_SELECTOR, "div.m-result-item-filtered-list__description")
+        description = description_element.text.strip() or description_element.get_attribute("textContent").strip()
+        
+        date_elements = item.find_elements(By.CSS_SELECTOR, "dl.m-result-item-filtered-list__metadata dd")
+        date = ""
+        if date_elements:
+            date = date_elements[-1].text.strip() or date_elements[-1].get_attribute("textContent").strip()
+            
+
+
+        url = item.get_attribute("href")
+
+        articles.append({
+            "title": title,
+            "date": date,
+            "description": description,
+            "url": url
+        })
+
+    driver.quit()
+    return articles
+
+
+
+
+
 if __name__ == "__main__":
     # articles = epa_scraper()
-    articles = pacelabs_scraper()
+    # articles = pacelabs_scraper()
+    articles = sgs_news_scraper()
     for article in articles:
         print(f"Title: {article['title']}\nPublished Date: {article['date']}\nURL: {article['url']}\nDescription: {article['description']}\n")
