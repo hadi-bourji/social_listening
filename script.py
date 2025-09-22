@@ -7,7 +7,7 @@ import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
-from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper
+from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
@@ -174,7 +174,6 @@ with tab_press_release:
     st.markdown("### Filter by Date Range")
     start_date, end_date = st.date_input("Select date range:", value=[yesterday, today])
 
-    # st.markdown("<p style='font-size:48px; font-weight:bold; color:#003883;'>United States Environmental Protection Agency (EPA)</p>", unsafe_allow_html=True)
     st.markdown(
     """
     <a href="https://www.epa.gov/newsreleases/search" target="_blank" 
@@ -300,6 +299,33 @@ with tab_press_release:
     gel_articles = gel_scraper()
     c = 1
     for article in gel_articles:
+        article_date = parse_date(article['date'])
+        if article_date and start_date <= article_date <= end_date:
+            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"**Published:** {article['date']}")
+            st.markdown(f"[Read Article]({article['url']})") 
+            st.markdown(f"**Description:** {article['description']}")
+
+            st.markdown("---")
+            c+=1
+            save_press_releases_to_db([article])
+    if c==1:
+        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+        st.markdown("---")
+
+    st.markdown(
+    """
+    <a href="https://emsl.com/News.aspx" target="_blank" 
+       style="text-decoration:none; color:#003883;">
+        <p style='font-size:48px; font-weight:bold; margin:0;'>
+            EMSL Analytical
+        </p>
+    </a>
+    """,
+    unsafe_allow_html=True)    
+    emsl_articles = emsl_scraper()
+    c = 1
+    for article in emsl_articles:
         article_date = parse_date(article['date'])
         if article_date and start_date <= article_date <= end_date:
             st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
