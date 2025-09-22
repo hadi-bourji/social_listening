@@ -7,7 +7,7 @@ import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
-from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper
+from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
@@ -202,6 +202,7 @@ with tab_press_release:
         st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
         st.markdown("---")
 
+
     st.markdown(
     """
     <a href="https://www.pacelabs.com/company/press-releases-and-articles/" target="_blank" 
@@ -228,6 +229,7 @@ with tab_press_release:
     if c==1:
         st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
         st.markdown("---")
+
 
     st.markdown(
     """
@@ -256,6 +258,7 @@ with tab_press_release:
         st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
         st.markdown("---")
 
+
     st.markdown(
     """
     <a href="https://montrose-env.com/news-events/" target="_blank" 
@@ -282,6 +285,35 @@ with tab_press_release:
     if c==1:
         st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
         st.markdown("---")
+
+
+    st.markdown(
+    """
+    <a href="https://www.gel.com/blog" target="_blank" 
+       style="text-decoration:none; color:#003883;">
+        <p style='font-size:48px; font-weight:bold; margin:0;'>
+            The GEL Group
+        </p>
+    </a>
+    """,
+    unsafe_allow_html=True)    
+    gel_articles = gel_scraper()
+    c = 1
+    for article in gel_articles:
+        article_date = parse_date(article['date'])
+        if article_date and start_date <= article_date <= end_date:
+            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"**Published:** {article['date']}")
+            st.markdown(f"[Read Article]({article['url']})") 
+            st.markdown(f"**Description:** {article['description']}")
+
+            st.markdown("---")
+            c+=1
+            save_press_releases_to_db([article])
+    if c==1:
+        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+        st.markdown("---")
+
 # --- Archive Search & Save ---
 with tab_archive:
     @st.fragment
