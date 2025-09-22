@@ -5,48 +5,54 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 
-def emsl_news_scraper():
+def babcock_news_scraper():
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                     "AppleWebKit/537.36 (KHTML, like Gecko) "
-                     "Chrome/122.0.0.0 Safari/537.36")
+                         "AppleWebKit/537.36 (KHTML, like Gecko) "
+                         "Chrome/122.0.0.0 Safari/537.36")
     driver = webdriver.Chrome(options=options)
 
-    driver.get("https://emsl.com/News.aspx")
+    driver.get("https://www.babcock.com/home/about/corporate/news")
 
-    # Wait for news items to load
-    news_items = WebDriverWait(driver, 15).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.row[style*='display: block']"))
+    wait = WebDriverWait(driver, 15)
+
+    news_items = wait.until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.box-news-item"))
     )
 
     articles = []
     for item in news_items:
-        # Get title
-        title_element = item.find_element(By.CSS_SELECTOR, "p.title")
-        title = title_element.get_attribute("data-abbr") or title_element.text.strip()
-        
-        # Get URL from the "Read More" link
-        url_element = item.find_element(By.CSS_SELECTOR, "a.readmore")
-        url = url_element.get_attribute("href")
-        if url.startswith("News.aspx"):
-            url = "https://emsl.com/" + url
-        
-        # Get and reformat date
-        date_element = item.find_element(By.CSS_SELECTOR, "p.date")
-        raw_date = date_element.get_attribute("data-abbr") or date_element.text.strip()
-        
-        # Convert from YYYY/MM/DD to "Month Day, Year"
+        # Title
         try:
-            dt = datetime.strptime(raw_date, "%Y/%m/%d")
-            formatted_date = dt.strftime("%B %d, %Y")  # e.g. "June 18, 2025"
-        except ValueError:
-            formatted_date = raw_date  # fallback if format is unexpected
-        
-        # Get description
-        desc_element = item.find_element(By.CSS_SELECTOR, "p:not(.title):not(.author):not(.date)")
-        description = desc_element.text.strip() or desc_element.get_attribute("textContent").strip()
-        
+            title_element = item.find_element(By.CSS_SELECTOR, "h2.text-heading a")
+            title = title_element.text.strip()
+            url = title_element.get_attribute("href")
+        except:
+            # Fallback: use the "Read More" link
+            title = ""
+            try:
+                url = item.find_element(By.CSS_SELECTOR, "a.brand-button-blue").get_attribute("href")
+            except:
+                url = ""
+
+        if url.startswith("/"):
+            url = "https://www.babcock.com" + url
+
+        # Date
+        try:
+            raw_date = item.find_element(By.CSS_SELECTOR, "p.text-news-date").text.strip()
+            dt = datetime.strptime(raw_date, "%B %d, %Y")
+            formatted_date = dt.strftime("%B %d, %Y")
+        except:
+            formatted_date = ""
+
+        # Description
+        try:
+            description = item.find_element(By.CSS_SELECTOR, "div.text-news-body div.mb-4").text.strip()
+        except:
+            description = ""
+
         articles.append({
             "title": title,
             "date": formatted_date,
@@ -57,8 +63,9 @@ def emsl_news_scraper():
     driver.quit()
     return articles
 
+
 if __name__ == "__main__":
-    articles = emsl_news_scraper()
+    articles = babcock_news_scraper()
     for article in articles:
         print(f"Title: {article['title']}")
         print(f"Published Date: {article['date']}")
