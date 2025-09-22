@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
 
-def babcock_news_scraper():
+def wecklabs_news_scraper():
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -13,43 +13,37 @@ def babcock_news_scraper():
                          "Chrome/122.0.0.0 Safari/537.36")
     driver = webdriver.Chrome(options=options)
 
-    driver.get("https://www.babcock.com/home/about/corporate/news")
+    driver.get("https://www.wecklabs.com/Company/SocialNetworking/News.aspx")
 
     wait = WebDriverWait(driver, 15)
-
     news_items = wait.until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.box-news-item"))
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.BlogBody"))
     )
 
     articles = []
     for item in news_items:
-        # Title
+        # Title + URL
         try:
-            title_element = item.find_element(By.CSS_SELECTOR, "h2.text-heading a")
+            title_element = item.find_element(By.CSS_SELECTOR, "h2.BlogTitle a")
             title = title_element.text.strip()
             url = title_element.get_attribute("href")
         except:
-            # Fallback: use the "Read More" link
             title = ""
-            try:
-                url = item.find_element(By.CSS_SELECTOR, "a.brand-button-blue").get_attribute("href")
-            except:
-                url = ""
+            url = ""
 
-        if url.startswith("/"):
-            url = "https://www.babcock.com" + url
-
-        # Date
+        # Date (convert to "Month Day, Year" format)
         try:
-            raw_date = item.find_element(By.CSS_SELECTOR, "p.text-news-date").text.strip()
-            dt = datetime.strptime(raw_date, "%B %d, %Y")
+            date_element = item.find_element(By.CSS_SELECTOR, "span.BlogDateline:nth-of-type(2)")
+            raw_date = date_element.text.strip()  # e.g., "9/17/2025 10:00 AM"
+            dt = datetime.strptime(raw_date, "%m/%d/%Y %I:%M %p")
             formatted_date = dt.strftime("%B %d, %Y")
         except:
             formatted_date = ""
 
-        # Description
+        # Description (first <p> inside main div)
         try:
-            description = item.find_element(By.CSS_SELECTOR, "div.text-news-body div.mb-4").text.strip()
+            desc_element = item.find_element(By.CSS_SELECTOR, "div[style*='padding-top'] p")
+            description = desc_element.text.strip()
         except:
             description = ""
 
@@ -65,7 +59,7 @@ def babcock_news_scraper():
 
 
 if __name__ == "__main__":
-    articles = babcock_news_scraper()
+    articles = wecklabs_news_scraper()
     for article in articles:
         print(f"Title: {article['title']}")
         print(f"Published Date: {article['date']}")
