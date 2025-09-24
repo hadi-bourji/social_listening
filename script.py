@@ -141,38 +141,13 @@ with st.sidebar:
 
 
 # --- Tabs ---
-tab_feed, tab_press_release, tab_archive, tab_full_archive = st.tabs(["Live RSS Feed", "Press Releases", "Archive Search", "Full Archive"])
-
-# --- RSS Feed Search ---
-with tab_feed:
-
-    ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
-    st.info("AI mode applies a machine learning filter to help improve article relevance.")
-
-    with st.spinner("Updating feeds and archiving..."):
-        filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
-     
-    if st.button("Run RSS Feed Search", key="rss_search"):
-        pass #when the user clicks the button it refreshes the entire script so it will run rss feed search by executing the search and archive function called above
-        
-    # Show last updated time if there are articles
-    if filtered_articles:
-        tz = pytz.timezone("America/Chicago")
-        last_updated = datetime.now(tz).strftime("%B %d, %Y at %I:%M:%S %p")
-        st.markdown(
-            f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
-            unsafe_allow_html=True
-        )
-        st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.")
-        display_articles(filtered_articles)
-
-
+tab_press_release, tab_feed, tab_archive, tab_full_archive = st.tabs([ "Press Releases", "Live RSS Feed","Archive Search", "Full Archive"])
 
 with tab_press_release:
     today = datetime.today().date()
-    yesterday = today - timedelta(days=1)
+    last_month = today - timedelta(days=30)
     st.markdown("### Filter by Date Range")
-    start_date, end_date = st.date_input("Select date range:", value=[yesterday, today])
+    start_date, end_date = st.date_input("Select date range:", value=[last_month, today])
 
     st.markdown(
     """
@@ -451,6 +426,29 @@ with tab_press_release:
     if c==1:
         st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
         st.markdown("---")
+
+# --- RSS Feed Search ---
+with tab_feed:
+
+    ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
+    st.info("AI mode applies a machine learning filter to help improve article relevance.")
+
+    with st.spinner("Updating feeds and archiving..."):
+        filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
+     
+    if st.button("Run RSS Feed Search", key="rss_search"):
+        pass #when the user clicks the button it refreshes the entire script so it will run rss feed search by executing the search and archive function called above
+        
+    # Show last updated time if there are articles
+    if filtered_articles:
+        tz = pytz.timezone("America/Chicago")
+        last_updated = datetime.now(tz).strftime("%B %d, %Y at %I:%M:%S %p")
+        st.markdown(
+            f"<p style='font-size:24px; font-weight:bold; color:#003883;'>Feed last updated: {last_updated}</p>",
+            unsafe_allow_html=True
+        )
+        st.subheader(f"Found {len(filtered_articles)} article(s) relevant to your desired keywords.")
+        display_articles(filtered_articles)
 
 # --- Archive Search & Save ---
 with tab_archive:

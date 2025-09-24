@@ -137,7 +137,6 @@ def montrose_scraper():
 
     driver.get("https://montrose-env.com/news-events/")
 
-    # Wait for grid items to load
     news_items = WebDriverWait(driver, 15).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.vc_grid-item"))
     )
@@ -145,7 +144,6 @@ def montrose_scraper():
     articles = []
     for item in news_items:
         try:
-            # Refetch elements inside a retry block to avoid stale references
             link_element = item.find_element(By.CSS_SELECTOR, "a")
             url = link_element.get_attribute("href")
 
@@ -165,7 +163,6 @@ def montrose_scraper():
                 "url": url
             })
         except StaleElementReferenceException:
-            # If stale, refetch the item from the DOM and retry
             try:
                 refreshed_item = driver.find_element(By.XPATH, f"//div[contains(@class,'vc_grid-item') and .//a[@href='{url}']]")
                 link_element = refreshed_item.find_element(By.CSS_SELECTOR, "a")
