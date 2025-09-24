@@ -174,255 +174,255 @@ with tab_press_release:
     st.markdown("### Filter by Date Range")
     start_date, end_date = st.date_input("Select date range:", value=[yesterday, today])
 
-    st.markdown(
-    """
-    <a href="https://www.epa.gov/newsreleases/search" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            United States Environmental Protection Agency (EPA)
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)
-    epa_articles = epa_scraper()
-    c = 1
-    for article in epa_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.epa.gov/newsreleases/search" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         United States Environmental Protection Agency (EPA)
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)
+    # epa_articles = epa_scraper()
+    # c = 1
+    # for article in epa_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
-
-
-    st.markdown(
-    """
-    <a href="https://www.pacelabs.com/company/press-releases-and-articles/" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Pace Analytics Labs
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)
-    pacelabs_articles = pacelabs_scraper()
-    c = 1
-    for article in pacelabs_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
-
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.sgs.com/en/news" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            SGS (Société Générale de Surveillance) 
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)       
-    sgs_articles = sgs_scraper()
-    c = 1
-    for article in sgs_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.pacelabs.com/company/press-releases-and-articles/" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Pace Analytics Labs
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)
+    # pacelabs_articles = pacelabs_scraper()
+    # c = 1
+    # for article in pacelabs_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
-
-
-    st.markdown(
-    """
-    <a href="https://montrose-env.com/news-events/" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Montrose Environmental
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    montrose_articles = montrose_scraper()
-    c = 1
-    for article in montrose_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
-
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.gel.com/blog" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            GEL Laboratories LLC
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    gel_articles = gel_scraper()
-    c = 1
-    for article in gel_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.sgs.com/en/news" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         SGS (Société Générale de Surveillance) 
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)       
+    # sgs_articles = sgs_scraper()
+    # c = 1
+    # for article in sgs_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
-
-    st.markdown(
-    """
-    <a href="https://emsl.com/News.aspx" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            EMSL Analytical
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    emsl_articles = emsl_scraper()
-    c = 1
-    for article in emsl_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
-
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.babcock.com/home/about/corporate/news" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Babcock & Wilcox
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    babcock_articles = babcock_scraper()
-    c = 1
-    for article in babcock_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://montrose-env.com/news-events/" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Montrose Environmental
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # montrose_articles = montrose_scraper()
+    # c = 1
+    # for article in montrose_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.wecklabs.com/Company/SocialNetworking/News.aspx" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Weck Laboratories
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    wecklabs_articles = wecklabs_scraper()
-    c = 1
-    for article in wecklabs_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.gel.com/blog" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         GEL Laboratories LLC
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # gel_articles = gel_scraper()
+    # c = 1
+    # for article in gel_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
+
+    # st.markdown(
+    # """
+    # <a href="https://emsl.com/News.aspx" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         EMSL Analytical
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # emsl_articles = emsl_scraper()
+    # c = 1
+    # for article in emsl_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
+
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
+
+
+    # st.markdown(
+    # """
+    # <a href="https://www.babcock.com/home/about/corporate/news" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Babcock & Wilcox
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # babcock_articles = babcock_scraper()
+    # c = 1
+    # for article in babcock_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
+
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
+
+
+    # st.markdown(
+    # """
+    # <a href="https://www.wecklabs.com/Company/SocialNetworking/News.aspx" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Weck Laboratories
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # wecklabs_articles = wecklabs_scraper()
+    # c = 1
+    # for article in wecklabs_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
+
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
     
 
-    st.markdown(
-    """
-    <a href="https://www.alsglobal.com/en/news-and-media" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            ALS (Australian Laboratory Services)
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    als_articles = alsglobal_scraper()
-    c = 1
-    for article in als_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.alsglobal.com/en/news-and-media" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         ALS (Australian Laboratory Services)
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # als_articles = alsglobal_scraper()
+    # c = 1
+    # for article in als_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
     st.markdown(
