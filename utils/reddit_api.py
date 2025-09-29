@@ -1,7 +1,8 @@
 import praw
-import ssl
-if hasattr(ssl, '_create_unverified_context'):
-    ssl._create_default_https_context = ssl._create_unverified_context
+from datetime import datetime
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+analyzer = SentimentIntensityAnalyzer()
 
 reddit = praw.Reddit(
     client_id="8etZ3kOpmdiNLX4KcTeeyA",
@@ -9,10 +10,17 @@ reddit = praw.Reddit(
     user_agent="sentiment_analysis_app/1.0 by YourUsername"
 )
 
-url = "https://www.reddit.com/r/funny/comments/3g1jfi/buttons/"
+for submission in reddit.subreddit("all").search("eurofins", limit=50):
+    submission_date = datetime.fromtimestamp(submission.created_utc)
+    print("Post title:", submission.title)
+    print("URL:", submission.url)
 
-submission = reddit.submission(url=url)
-submission.comments.replace_more(limit=None)
+    submission.comments.replace_more(limit=None)
+    
+    for top_level_comment in submission.comments:
+        comment_date = datetime.fromtimestamp(top_level_comment.created_utc)
+        score = analyzer.polarity_scores(top_level_comment.body)
+        print("{} {:<65} {}".format(comment_date, top_level_comment.body, str(score["compound"])))
 
-for top_level_comment in submission.comments:
-    print(top_level_comment.body)
+    
+    print("---- End of Submission ----\n")
