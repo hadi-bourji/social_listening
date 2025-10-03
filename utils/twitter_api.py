@@ -25,7 +25,7 @@ response = requests.post(url, headers=headers, json=data)
 uuid = response.json()['uuid']
 
 url = f"https://data.gopher-ai.com/api/v1/search/live/twitter/result/{uuid}" 
-headers = {"Authorization": "Bearer cRhwzuoFPgW3j0cBQRhPDxE1FOWIJ23SBvKWLyF5huYHraYI"}
+headers = {"Authorization": "Bearer removed for privacy"}
 for i in range(5): 
     response = requests.get(url, headers={"Authorization": headers["Authorization"]})
     if response.status_code == 200:
