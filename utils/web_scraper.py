@@ -11,6 +11,7 @@ def epa_scraper():
     options = Options()
     options.add_argument("--headless=new")
     options.binary_location = "/usr/bin/chromium"
+    #above line should be commented in vscode since browser is found by default. in streamlit we need to give path to browser, so above line is not commented.
     driver = webdriver.Chrome(options=options)
     driver.get("https://www.epa.gov/newsreleases/search")
 
@@ -332,6 +333,7 @@ def babcock_scraper():
     driver.quit()
     return articles
 
+from selenium.common.exceptions import TimeoutException
 def wecklabs_scraper():
     options = Options()
     options.add_argument("--headless=new")
@@ -343,9 +345,12 @@ def wecklabs_scraper():
     driver.get("https://www.wecklabs.com/Company/SocialNetworking/News.aspx")
 
     wait = WebDriverWait(driver, 15)
-    news_items = wait.until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.BlogBody"))
-    )
+
+    try:
+        news_items = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.BlogBody")))
+    except TimeoutException:
+        driver.quit()
+        return []  
 
     articles = []
     for item in news_items:
