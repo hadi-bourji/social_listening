@@ -83,7 +83,8 @@ with st.sidebar:
         "https://www.ksn.com/news/local/feed/",
         "https://fox2now.com/news/feed/",
         "https://www.wbbjtv.com/feed/",
-        "https://www.tristatehomepage.com/feed/"
+        "https://www.tristatehomepage.com/feed/",
+        "https://envnewsbits.info/feed/"
     ]
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
