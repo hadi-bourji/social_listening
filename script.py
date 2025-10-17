@@ -460,7 +460,7 @@ with tab_archive:
             index=0,
             key="archive_match_type"
         )
-        keyword_filter = st.text_input("Keyword (separate keywords with commas)", key="archive_keyword")
+        keyword_filter = st.text_input("Keyword (comma-separated)", key="archive_keyword")
         start_date = st.date_input("Start Date", key="archive_start_date")
         end_date = st.date_input("End Date", key="archive_end_date")
         # Search Current Archive 
