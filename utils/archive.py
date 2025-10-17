@@ -48,7 +48,7 @@ def save_articles_to_db(articles):
             INSERT OR IGNORE INTO articles (title, link, published, matched_keywords, context)
             VALUES (?, ?, ?, ?, ?)
         ''', (
-            article['Article Title'],
+            f"RSS Article: {article['Article Title']}",
             article['Article Link'],
             dt_iso,
             ", ".join(sorted(article['Matched Keywords'])),
