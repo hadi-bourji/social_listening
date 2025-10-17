@@ -17,7 +17,7 @@ st_autorefresh(interval=random_approx_hour, limit=None, key="hourly_refresh")
 st.set_page_config(page_title="Incident Feed", layout="wide")
 st.image("Eurofins.png", width=500)
 st.markdown(
-    "<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental Emergency News Monitor</p>",
+    "<p style='font-size:48px; font-weight:bold; color:#003883;'>Environmental News Monitor</p>",
     unsafe_allow_html=True
 )
 
