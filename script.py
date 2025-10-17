@@ -141,7 +141,7 @@ with st.sidebar:
 
 
 # --- Tabs ---
-tab_press_release, tab_feed, tab_archive, tab_full_archive = st.tabs([ "Press Releases", "Live RSS Feed","Archive Search", "Full Archive"])
+tab_press_release, tab_feed, tab_archive, tab_full_archive = st.tabs([ "Industry & Regulatory Updates", "Live RSS Feed","Archive Search", "Full Archive"])
 
 with tab_press_release:
     today = datetime.today().date()
