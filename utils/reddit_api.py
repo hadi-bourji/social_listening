@@ -1,4 +1,5 @@
 import praw
+import matplotlib.pyplot as plt
 from datetime import datetime, timezone
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
@@ -138,8 +139,15 @@ def hf():
 
 
 if __name__ == "__main__":
-    # vader()
-    # blob()
-    # hf()
-    months = monthly_comment_totals("PFAS")
+    query = "PFAS"
+    months = monthly_comment_totals(query)
+
+    plt.plot(months.keys(), months.values(), marker = 'o')
+    plt.title(f"Query: {query}", fontsize=20)
+    plt.xlabel("Month", fontsize=14)
+    plt.ylabel("Volume of Mentions",  fontsize=14)
+    plt.xticks(rotation=45, ha='right')
+    plt.grid(axis='y',linestyle=':')
+    plt.show()
+    
     print(months)
