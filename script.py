@@ -9,7 +9,7 @@ from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
 from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper, babcock_scraper, wecklabs_scraper, alsglobal_scraper, microbac_scraper
-from utils.reddit_api import monthly_comment_totals
+from utils.reddit_api import last_12_month, monthly_comment_totals
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
