@@ -2,12 +2,14 @@ import streamlit as st
 import pandas as pd
 import random
 import os
+import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import pytz
 from streamlit_autorefresh import st_autorefresh
 from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
 from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper, babcock_scraper, wecklabs_scraper, alsglobal_scraper, microbac_scraper
+from utils.reddit_api import monthly_comment_totals
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
@@ -142,7 +144,7 @@ with st.sidebar:
 
 
 # --- Tabs ---
-tab_press_release, tab_feed, tab_archive, tab_full_archive = st.tabs([ "Industry & Regulatory Updates", "Live RSS Feed","Archive Search", "Full Archive"])
+tab_press_release, tab_feed, tab_archive, tab_full_archive, tab_keyword_trends = st.tabs([ "Industry & Regulatory Updates", "Live RSS Feed","Archive Search", "Full Archive", "Keyword Trends"])
 
 with tab_press_release:
     today = datetime.today().date()
@@ -515,3 +517,30 @@ with tab_full_archive:
 )
     else:
         st.info("No archived articles found.")
+
+with tab_keyword_trends:
+    @st.fragment
+    def keyword_trends():
+        st.subheader("Reddit Volume of Mentions")
+        st.info("Aggregates the number of comments from the top 1,000 Reddit posts matching the keyword over the past 12 months, and visualizes monthly engagement trends.")
+        keyword_filter = st.text_input("Enter a keyword.", key="trends_keyword")
+
+        if keyword_filter:
+            status = st.empty()
+            status.write(f"Analyzing monthly comment volume for **{keyword_filter}**...")
+            query = keyword_filter
+            months = monthly_comment_totals(query)
+
+            fig, ax = plt.subplots()
+            fig.set_size_inches(6,3)
+            ax.plot(months.keys(), months.values(), marker = 'o')
+            ax.set_title(f"Query: {query}", fontsize=14)
+            ax.set_xlabel("Month", fontsize=10)
+            ax.set_ylabel("Volume of Mentions",  fontsize=10)
+            ax.tick_params(axis='x', rotation=45, labelsize=10)
+            ax.tick_params(axis='y', labelsize=10)
+            ax.grid(axis='y',linestyle=':')
+            
+            st.pyplot(fig, use_container_width=False)
+            status.empty()
+    keyword_trends()
