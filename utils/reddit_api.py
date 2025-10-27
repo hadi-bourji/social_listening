@@ -2,8 +2,8 @@ import praw
 import matplotlib.pyplot as plt
 from datetime import datetime, timezone
 # from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-from textblob import TextBlob
-from transformers import pipeline
+# from textblob import TextBlob
+# from transformers import pipeline
 
 reddit = praw.Reddit(
     client_id="8etZ3kOpmdiNLX4KcTeeyA",
