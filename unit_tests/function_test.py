@@ -3,9 +3,9 @@ import re
 import pytz
 from datetime import datetime
 from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper, babcock_scraper, wecklabs_scraper, alsglobal_scraper, microbac_scraper
-from utils.articles import replace_tag_with_boundary, remove_exact_duplicates_and_international, convert_article_to_central, convert_articles_to_central
+from utils.articles import replace_tag_with_boundary, remove_exact_duplicates_and_international, convert_article_to_central, convert_articles_to_central, get_relevant_articles
 
-# Run with python -m pytest unit_tests/function_test.py in social_listening directory
+# Run with python -m pytest unit_tests/function_test.py from social_listening directory
 
 scrapers = [pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper, babcock_scraper, wecklabs_scraper, alsglobal_scraper, microbac_scraper]
 
@@ -51,7 +51,7 @@ def test_remove_exact_duplicates_and_international():
                 'Article Link': 'link',
                 'Date and Time Published': 'date',
                 'Matched Keywords': 'matched_keywords',
-                'Context': 'no countries here!'
+                'Context': 'no international countries here!'
             }}
     result = remove_exact_duplicates_and_international(d)
     assert result == {1:{
@@ -59,7 +59,7 @@ def test_remove_exact_duplicates_and_international():
                 'Article Link': 'link',
                 'Date and Time Published': 'date',
                 'Matched Keywords': 'matched_keywords',
-                'Context': 'no countries here!'
+                'Context': 'no international countries here!'
             }}
     
 
