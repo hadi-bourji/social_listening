@@ -93,3 +93,67 @@ def test_convert_article_with_timezone():
     for article in results.values():
         assert "datetime_obj" in article
         assert "readable_time" in article
+
+
+@pytest.fixture
+def sample_articles():
+    return [
+        {
+            "title": "Climate Change and Its Effects",
+            "link": "http://example.com/climate",
+            "published": "2025-11-01",
+            "content": "Climate change is a pressing issue. Rising temperatures affect ecosystems."
+        },
+        {
+            "title": "Tech Innovations in 2025",
+            "link": "http://example.com/tech",
+            "published": "2025-11-02",
+            "content": "Artificial Intelligence and Machine Learning are transforming industries."
+        },
+        {
+            "title": "Empty Article",
+            "link": "http://example.com/empty",
+            "published": "2025-11-03",
+            "content": ""
+        }
+    ]
+
+def test_or_match(sample_articles):
+    keywords = ["climate", "AI", "machine learning"]
+    result = get_relevant_articles(sample_articles, keywords, match_type="OR")
+    titles = [v['Article Title'] for v in result.values()]
+    assert len(result) == 2
+    assert "Climate Change and Its Effects" in titles
+    assert "Tech Innovations in 2025" in titles
+
+def test_and_match(sample_articles):
+    keywords = ["artificial intelligence", "machine learning"]
+    result = get_relevant_articles(sample_articles, keywords, match_type="AND")
+    assert len(result) == 1
+    assert result[1]['Article Title'] == "Tech Innovations in 2025"
+
+def test_no_match(sample_articles):
+    keywords = ["quantum"]
+    result = get_relevant_articles(sample_articles, keywords, match_type="OR")
+    assert result == {}
+
+def test_sentence_splitting_and_context_extraction():
+    articles = [
+        {
+            "title": "AI in Healthcare",
+            "link": "http://example.com/ai-healthcare",
+            "published": "2025-11-01",
+            "content": "Dr. Smith discussed the impact of Artificial Intelligence. AI is transforming diagnostics. U.S. hospitals are adopting it rapidly."
+        }
+    ]
+    keywords = ["Artificial Intelligence", "diagnostics"]
+    result = get_relevant_articles(articles, keywords, match_type="OR")
+    assert len(result) == 1
+    context_sentences = list(result[1]['Context'])
+
+    for s in context_sentences:
+        print(s)
+
+    assert any("Dr. Smith discussed the impact of **Artificial Intelligence**." in s for s in context_sentences)
+    
+    assert any("AI is transforming **diagnostics**." in s for s in context_sentences)
