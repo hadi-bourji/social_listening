@@ -251,6 +251,7 @@ def parse_date(date_str):
     date_str = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str)
 
     formats = [
+        "%Y-%m-%d",    # 2025-06-02 (ISO format)
         "%B %d, %Y",   # September 12, 2024
         "%b %d, %Y",   # Sep 12, 2024
         "%B %Y",       # September 2024
