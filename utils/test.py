@@ -3,13 +3,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import undetected_chromedriver as uc
+from selenium.common.exceptions import StaleElementReferenceException
 from urllib.parse import urljoin
 from datetime import datetime
 
-from selenium.common.exceptions import StaleElementReferenceException
-
-def montrose_scraper():
+def babcock_scraper():
     options = Options()
     options.add_argument("--headless=new")
     options.add_argument(
@@ -19,28 +17,46 @@ def montrose_scraper():
     )
     driver = webdriver.Chrome(options=options)
 
-    driver.get("https://montrose-env.com/news-events/")
+    # Replace with actual Babcock Laboratories news URL
+    driver.get("https://www.babcocklabs.com/news")  # Update this URL
 
-    # Wait for grid items to load
+    # Wait for article items to load
     news_items = WebDriverWait(driver, 15).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.vc_grid-item"))
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
     )
 
     articles = []
     for item in news_items:
         try:
-            # Refetch elements inside a retry block to avoid stale references
-            link_element = item.find_element(By.CSS_SELECTOR, "a")
-            url = link_element.get_attribute("href")
+            # Extract title from h1
+            title_element = item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
+            title = title_element.text.strip()
+            url = title_element.get_attribute("href")
 
-            title_element = item.find_element(By.CSS_SELECTOR, "h4")
-            title = title_element.text.strip() or title_element.get_attribute("textContent").strip()
+            # Extract date from time element
+            date_element = item.find_element(By.CSS_SELECTOR, "time.dt-published")
+            date = date_element.get_attribute("datetime")  # Gets ISO format date
+            
+            # Extract description from summary div
+            try:
+                desc_element = item.find_element(By.CSS_SELECTOR, "div.p-summary p")
+                description = desc_element.text.strip()
+            except:
+                description = ""
 
-            desc_element = item.find_element(By.CSS_SELECTOR, ".vc_gitem-post-data-source-post_excerpt")
-            description = desc_element.text.strip() or desc_element.get_attribute("textContent").strip()
+            # Extract author
+            try:
+                author_element = item.find_element(By.CSS_SELECTOR, "span.entry-author a")
+                author = author_element.text.strip()
+            except:
+                author = ""
 
-            date_element = item.find_element(By.CSS_SELECTOR, ".vc_gitem-post-data-source-post_date")
-            date = date_element.text.strip() or date_element.get_attribute("textContent").strip()
+            # Extract category
+            try:
+                category_element = item.find_element(By.CSS_SELECTOR, "span.entry-category a")
+                category = category_element.text.strip()
+            except:
+                category = ""
 
             articles.append({
                 "title": title,
@@ -49,37 +65,30 @@ def montrose_scraper():
                 "url": url
             })
         except StaleElementReferenceException:
-            # If stale, refetch the item from the DOM and retry
+            # Retry if element becomes stale
             try:
-                refreshed_item = driver.find_element(By.XPATH, f"//div[contains(@class,'vc_grid-item') and .//a[@href='{url}']]")
-                link_element = refreshed_item.find_element(By.CSS_SELECTOR, "a")
-                url = link_element.get_attribute("href")
-
-                title_element = refreshed_item.find_element(By.CSS_SELECTOR, "h4")
-                title = title_element.text.strip() or title_element.get_attribute("textContent").strip()
-
-                desc_element = refreshed_item.find_element(By.CSS_SELECTOR, ".vc_gitem-post-data-source-post_excerpt")
-                description = desc_element.text.strip() or desc_element.get_attribute("textContent").strip()
-
-                date_element = refreshed_item.find_element(By.CSS_SELECTOR, ".vc_gitem-post-data-source-post_date")
-                date = date_element.text.strip() or date_element.get_attribute("textContent").strip()
-
-                articles.append({
-                    "title": title,
-                    "date": date,
-                    "description": description,
-                    "url": url
-                })
+                refreshed_items = driver.find_elements(By.CSS_SELECTOR, "article.entry.h-entry.hentry")
+                for refreshed_item in refreshed_items:
+                    try:
+                        title_element = refreshed_item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
+                        current_url = title_element.get_attribute("href")
+                        if current_url == url:
+                            # Already processed
+                            break
+                    except:
+                        continue
             except Exception:
                 continue
+        except Exception as e:
+            print(f"Error processing article: {e}")
+            continue
 
     driver.quit()
     return articles
 
 
-
-
 if __name__ == "__main__":
-    data = montrose_scraper()
+    data = babcock_scraper()
     for d in data:
         print(d)
+        print("-" * 80)
