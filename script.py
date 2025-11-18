@@ -47,12 +47,12 @@ excluded_keywords = load_exclusions(EXCLUDED_KEYWORDS_FILE)
 # --- Sidebar Inputs ---
 with st.sidebar:
 
-    st.header("Search Current RSS Feeds", divider="blue")   
+    st.header("Search Current RSS Feeds", divider="blue")  
     # Sort options
     sort_options = ["None", "Published Date (Newest First)", "Number of Keywords Matched (Most)"]
     selected_sort = st.selectbox("Sort articles by", sort_options, key="sort_articles")
-                     #wichita-kansas, st louis, 
-                     #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn, boston
+                    #wichita-kansas, st louis, 
+                    #detroit, cleveland, port arthur, san francisco, chicago, pittsburgh, denver, jersey city, sacramento, seattle, st louis, brooklyn, boston
     default_rss = [  #national, new orleans, indianapolis, los angeles, hawaii, houston, philadelphia, baltimore, dallas, richmond virginia, raleigh, miami, tristate area
         "https://feeds.nbcnews.com/nbcnews/public/news",
         "https://moxie.foxnews.com/google-publisher/us.xml",
@@ -92,17 +92,22 @@ with st.sidebar:
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
     extra_rss = [url.strip() for url in extra_rss_input.splitlines() if url.strip()]
     all_rss = default_rss + extra_rss
-    select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
-    selected_rss = [feed for feed in all_rss if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}")]
 
-    #remove feed sites and add to exclusion file
-    st.markdown("---")
-    rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
-    if rss_to_remove != "None" and st.button("Delete Feed"):
-        add_to_exclusions(EXCLUDED_RSS_FILE, rss_to_remove)
-        st.success(f"Removed feed: {rss_to_remove}")
-        st.rerun()
-    st.markdown("---")
+    with st.expander("Manage RSS Feeds"):
+         
+        select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
+        selected_rss = [feed for feed in all_rss if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}")]
+
+        #remove feed sites and add to exclusion file
+        st.markdown("---")
+        rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
+        if rss_to_remove != "None" and st.button("Delete Feed"):
+            add_to_exclusions(EXCLUDED_RSS_FILE, rss_to_remove)
+            st.success(f"Removed feed: {rss_to_remove}")
+            st.rerun()
+        st.markdown("---")
+
+
     # Keywords
     st.subheader("Keywords")
     # Match type
@@ -132,19 +137,23 @@ with st.sidebar:
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
     extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
     all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
-    select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
-    selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
 
-    st.markdown("---")
-    kw_to_remove = st.selectbox("Delete a keyword permanently", ["None"] + default_keywords, key="remove_kw")
-    if kw_to_remove != "None" and st.button("Delete Keyword"):
-        add_to_exclusions(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
-        st.success(f"Removed keyword: {kw_to_remove}")
-        st.rerun()
+    with st.expander("Manage Keywords"):
+        
+        select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
+        selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
+
+        st.markdown("---")
+        kw_to_remove = st.selectbox("Delete a keyword permanently", ["None"] + default_keywords, key="remove_kw")
+        if kw_to_remove != "None" and st.button("Delete Keyword"):
+            add_to_exclusions(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
+            st.success(f"Removed keyword: {kw_to_remove}")
+            st.rerun()
 
 
 # --- Tabs ---
-tab_press_release, tab_feed, tab_archive, tab_full_archive, tab_keyword_trends = st.tabs([ "Industry & Regulatory Updates", "Live RSS Feed","Archive Search", "Full Archive", "Keyword Trends"])
+tab_press_release, tab_feed, tab_archive, tab_full_archive, tab_keyword_trends, tab_settings = st.tabs([ "Industry & Regulatory Updates", "Live RSS Feed","Archive Search",
+                                                                                                         "Full Archive", "Keyword Trends", "Settings"])
 
 with tab_press_release:
     today = datetime.today().date()
@@ -180,32 +189,32 @@ with tab_press_release:
         st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.pacelabs.com/company/press-releases-and-articles/" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Pace Analytics Labs
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)
-    pacelabs_articles = pacelabs_scraper()
-    c = 1
-    for article in pacelabs_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.pacelabs.com/company/press-releases-and-articles/" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Pace Analytics Labs
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)
+    # pacelabs_articles = pacelabs_scraper()
+    # c = 1
+    # for article in pacelabs_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article['date']}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
     st.markdown(
@@ -321,10 +330,10 @@ with tab_press_release:
 
     st.markdown(
     """
-    <a href="https://www.babcock.com/home/about/corporate/news" target="_blank" 
+    <a href="https://www.babcocklabs.com/news" target="_blank" 
        style="text-decoration:none; color:#003883;">
         <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Babcock & Wilcox
+            Babcock Laboratories
         </p>
     </a>
     """,
@@ -335,7 +344,7 @@ with tab_press_release:
         article_date = parse_date(article['date'])
         if article_date and start_date <= article_date <= end_date:
             st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article['date']}")
+            st.markdown(f"**Published:** {article_date.strftime('%B %d, %Y')}")
             st.markdown(f"[Read Article]({article['url']})") 
             st.markdown(f"**Description:** {article['description']}")
 
@@ -433,8 +442,8 @@ with tab_press_release:
 # --- RSS Feed Search ---
 with tab_feed:
 
-    ai_mode = st.checkbox("AI Mode", value=True,key="AI_mode")
-    st.info("AI mode applies a machine learning filter to help improve article relevance.")
+    ai_mode = st.toggle("AI Mode", value=True, key="AI_mode", help="Enabling AI mode allows our model to filter out articles that contain your keyword, but " \
+                        "that are unrelated to chemical incidents (for example, a headline about an app's 'explosion' in popularity).")
 
     with st.spinner("Updating feeds and archiving..."):
         filtered_articles = update_feed_and_archive(selected_rss, selected_keywords, match_type, selected_sort, ai_mode)
@@ -544,3 +553,20 @@ with tab_keyword_trends:
             st.pyplot(fig, use_container_width=False)
             status.empty()
     keyword_trends()
+
+
+with tab_settings:
+    @st.fragment
+    def deletion():
+        # st.subheader("Manage RSS Feeds")
+        st.markdown("---")
+        
+        for feed in all_rss:
+            cols = st.columns([6,1])
+            cols[0].write(feed)
+            if cols[1].button("Delete permanently", key=f"delete_{feed}"):
+                add_to_exclusions(EXCLUDED_RSS_FILE,feed)
+                st.success(f"Removed {feed}")
+            st.markdown("---")
+    with st.expander("Manage RSS Feeds"):
+        deletion()
