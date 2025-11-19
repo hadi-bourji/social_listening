@@ -333,88 +333,78 @@ def wrong_babcock_scraper():
     driver.quit()
     return articles
 
+
 def babcock_scraper():
     options = Options()
     options.add_argument("--headless=new")
-    options.binary_location = "/usr/bin/chromium"
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+    options.binary_location = "/usr/bin/chromium"
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/122.0.0.0 Safari/537.36"
     )
-    driver = webdriver.Chrome(options=options)
 
-    # Replace with actual Babcock Laboratories news URL
-    driver.get("https://www.babcocklabs.com/news")  # Update this URL
+    service = Service("/usr/bin/chromedriver")
+    driver = webdriver.Chrome(service=service, options=options)
 
-    # Wait for article items to load
-    news_items = WebDriverWait(driver, 15).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
-    )
+    driver.set_page_load_timeout(90)
+    driver.set_script_timeout(90)
 
+    url = "https://www.babcocklabs.com/news"
     articles = []
-    for item in news_items:
-        try:
-            # Extract title from h1
-            title_element = item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
-            title = title_element.text.strip()
-            url = title_element.get_attribute("href")
 
-            # Extract date from time element
-            date_element = item.find_element(By.CSS_SELECTOR, "time.dt-published")
-            date = date_element.get_attribute("datetime")  # Gets ISO format date
-            
-            # Extract description from summary div
-            try:
-                desc_element = item.find_element(By.CSS_SELECTOR, "div.p-summary p")
-                description = desc_element.text.strip()
-            except:
-                description = ""
+    try:
+        driver.get(url)
 
-            # Extract author
-            try:
-                author_element = item.find_element(By.CSS_SELECTOR, "span.entry-author a")
-                author = author_element.text.strip()
-            except:
-                author = ""
+        # Wait for DOM ready
+        WebDriverWait(driver, 30).until(
+            lambda d: d.execute_script("return document.readyState") == "complete"
+        )
 
-            # Extract category
-            try:
-                category_element = item.find_element(By.CSS_SELECTOR, "span.entry-category a")
-                category = category_element.text.strip()
-            except:
-                category = ""
+        # Scroll to ensure all content loads
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
 
-            articles.append({
-                "title": title,
-                "date": date,
-                "description": description,
-                "url": url
-            })
-        except StaleElementReferenceException:
-            # Retry if element becomes stale
+        # Wait for articles
+        news_items = WebDriverWait(driver, 30).until(
+            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
+        )
+
+        for item in news_items:
             try:
-                refreshed_items = driver.find_elements(By.CSS_SELECTOR, "article.entry.h-entry.hentry")
-                for refreshed_item in refreshed_items:
-                    try:
-                        title_element = refreshed_item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
-                        current_url = title_element.get_attribute("href")
-                        if current_url == url:
-                            # Already processed
-                            break
-                    except:
-                        continue
-            except Exception:
+                title_element = item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
+                title = title_element.text.strip()
+                url = title_element.get_attribute("href")
+
+                date_element = item.find_element(By.CSS_SELECTOR, "time.dt-published")
+                date = date_element.get_attribute("datetime")
+
+                desc_element = item.find_element(By.CSS_SELECTOR, "div.p-summary p") if item.find_elements(By.CSS_SELECTOR, "div.p-summary p") else None
+                description = desc_element.text.strip() if desc_element else ""
+
+                articles.append({
+                    "title": title,
+                    "date": date,
+                    "description": description,
+                    "url": url
+                })
+
+            except Exception as e:
+                print(f"Error processing article: {e}")
                 continue
-        except Exception as e:
-            print(f"Error processing article: {e}")
-            continue
 
-    driver.quit()
+    except TimeoutException:
+        print("Timeout loading Babcock Labs page.")
+    finally:
+        driver.quit()
+
     return articles
+
 
 from selenium.common.exceptions import TimeoutException
 def wecklabs_scraper():
