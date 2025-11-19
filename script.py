@@ -92,10 +92,20 @@ with st.sidebar:
         "https://www.tristatehomepage.com/feed/",
         "https://envnewsbits.info/feed/"
     ]
+    
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
-    extra_rss = [url.strip() for url in extra_rss_input.splitlines() if url.strip()]
-    all_rss = default_rss + extra_rss
+
+    if extra_rss_input.strip():
+        new_feeds = [line.strip() for line in extra_rss_input.splitlines() if line.strip()]
+        for feed in new_feeds:
+            if feed not in user_rss:
+                add_to_file(USER_RSS_FILE, feed)
+                user_rss.add(feed)
+
+    all_rss = default_rss + list(user_rss)
+
+    
 
     with st.expander("Manage RSS Feeds"):
          
