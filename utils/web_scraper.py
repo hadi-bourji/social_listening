@@ -10,7 +10,7 @@ def epa_scraper():
     # Scrapes EPA press release site. Returns each article title, date published, description, and the article URL.
     options = Options()
     options.add_argument("--headless=new")
-    # options.binary_location = "/usr/bin/chromium"
+    options.binary_location = "/usr/bin/chromium"
     #above line should be commented in vscode since browser is found by default. in streamlit we need to give path to browser, so above line is not commented.
     driver = webdriver.Chrome(options=options)
     driver.get("https://www.epa.gov/newsreleases/search")
@@ -333,92 +333,88 @@ def wrong_babcock_scraper():
     driver.quit()
     return articles
 
-
 def babcock_scraper():
     options = Options()
-    # Headless mode (remove for debugging)
     options.add_argument("--headless=new")
-    options.add_argument("--disable-blink-features=AutomationControlled")
+    
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+
     options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/122.0.0.0 Safari/537.36"
     )
-
     driver = webdriver.Chrome(options=options)
-    driver.set_page_load_timeout(60)
-    driver.set_script_timeout(60)
 
-    url = "https://www.babcocklabs.com/news"
+    # Replace with actual Babcock Laboratories news URL
+    driver.get("https://www.babcocklabs.com/news")  # Update this URL
+
+    # Wait for article items to load
+    news_items = WebDriverWait(driver, 15).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
+    )
+
     articles = []
+    for item in news_items:
+        try:
+            # Extract title from h1
+            title_element = item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
+            title = title_element.text.strip()
+            url = title_element.get_attribute("href")
 
-    try:
-        driver.get(url)
-
-        # Wait for page to fully load
-        WebDriverWait(driver, 30).until(
-            lambda d: d.execute_script("return document.readyState") == "complete"
-        )
-
-        # Wait for news items to appear
-        news_items = WebDriverWait(driver, 20).until(
-            EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
-        )
-
-        for item in news_items:
+            # Extract date from time element
+            date_element = item.find_element(By.CSS_SELECTOR, "time.dt-published")
+            date = date_element.get_attribute("datetime")  # Gets ISO format date
+            
+            # Extract description from summary div
             try:
-                title_element = item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
-                title = title_element.text.strip()
-                article_url = title_element.get_attribute("href")
+                desc_element = item.find_element(By.CSS_SELECTOR, "div.p-summary p")
+                description = desc_element.text.strip()
+            except:
+                description = ""
 
-                date_element = item.find_element(By.CSS_SELECTOR, "time.dt-published")
-                date = date_element.get_attribute("datetime")
+            # Extract author
+            try:
+                author_element = item.find_element(By.CSS_SELECTOR, "span.entry-author a")
+                author = author_element.text.strip()
+            except:
+                author = ""
 
-                try:
-                    desc_element = item.find_element(By.CSS_SELECTOR, "div.p-summary p")
-                    description = desc_element.text.strip()
-                except:
-                    description = ""
+            # Extract category
+            try:
+                category_element = item.find_element(By.CSS_SELECTOR, "span.entry-category a")
+                category = category_element.text.strip()
+            except:
+                category = ""
 
-                try:
-                    author_element = item.find_element(By.CSS_SELECTOR, "span.entry-author a")
-                    author = author_element.text.strip()
-                except:
-                    author = ""
-
-                try:
-                    category_element = item.find_element(By.CSS_SELECTOR, "span.entry-category a")
-                    category = category_element.text.strip()
-                except:
-                    category = ""
-
-                articles.append({
-                    "title": title,
-                    "date": date,
-                    "description": description,
-                    "url": article_url,
-                    "author": author,
-                    "category": category
-                })
-
-            except StaleElementReferenceException:
-                print("Stale element encountered, skipping...")
+            articles.append({
+                "title": title,
+                "date": date,
+                "description": description,
+                "url": url
+            })
+        except StaleElementReferenceException:
+            # Retry if element becomes stale
+            try:
+                refreshed_items = driver.find_elements(By.CSS_SELECTOR, "article.entry.h-entry.hentry")
+                for refreshed_item in refreshed_items:
+                    try:
+                        title_element = refreshed_item.find_element(By.CSS_SELECTOR, "h1.entry-title a")
+                        current_url = title_element.get_attribute("href")
+                        if current_url == url:
+                            # Already processed
+                            break
+                    except:
+                        continue
+            except Exception:
                 continue
-            except Exception as e:
-                print(f"Error processing article: {e}")
-                continue
+        except Exception as e:
+            print(f"Error processing article: {e}")
+            continue
 
-    except TimeoutException:
-        print("Page load or element wait timed out.")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-    finally:
-        driver.quit()
-
+    driver.quit()
     return articles
-
 
 from selenium.common.exceptions import TimeoutException
 def wecklabs_scraper():
