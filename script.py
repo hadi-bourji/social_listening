@@ -102,15 +102,6 @@ with st.sidebar:
         select_all_rss = st.checkbox("Select/Deselect All Feeds", value=True, key="select_all_rss")
         selected_rss = [feed for feed in all_rss if st.checkbox(feed, value=select_all_rss, key=f"rss_{feed}")]
 
-        #remove feed sites and add to exclusion file
-        st.markdown("---")
-        rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
-        if rss_to_remove != "None" and st.button("Delete Feed"):
-            add_to_file(EXCLUDED_RSS_FILE, rss_to_remove)
-            st.success(f"Removed feed: {rss_to_remove}")
-            st.rerun()
-        st.markdown("---")
-
 
     # Keywords
     st.subheader("Keywords")
@@ -146,13 +137,6 @@ with st.sidebar:
         
         select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
         selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
-
-        st.markdown("---")
-        kw_to_remove = st.selectbox("Delete a keyword permanently", ["None"] + default_keywords, key="remove_kw")
-        if kw_to_remove != "None" and st.button("Delete Keyword"):
-            add_to_file(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
-            st.success(f"Removed keyword: {kw_to_remove}")
-            st.rerun()
 
 
 # --- Tabs ---
