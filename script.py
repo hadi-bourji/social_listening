@@ -333,32 +333,32 @@ with tab_press_release:
         st.markdown("---")
 
 
-    st.markdown(
-    """
-    <a href="https://www.babcocklabs.com/news" target="_blank" 
-       style="text-decoration:none; color:#003883;">
-        <p style='font-size:48px; font-weight:bold; margin:0;'>
-            Babcock Laboratories
-        </p>
-    </a>
-    """,
-    unsafe_allow_html=True)    
-    babcock_articles = babcock_scraper()
-    c = 1
-    for article in babcock_articles:
-        article_date = parse_date(article['date'])
-        if article_date and start_date <= article_date <= end_date:
-            st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
-            st.markdown(f"**Published:** {article_date.strftime('%B %d, %Y')}")
-            st.markdown(f"[Read Article]({article['url']})") 
-            st.markdown(f"**Description:** {article['description']}")
+    # st.markdown(
+    # """
+    # <a href="https://www.babcocklabs.com/news" target="_blank" 
+    #    style="text-decoration:none; color:#003883;">
+    #     <p style='font-size:48px; font-weight:bold; margin:0;'>
+    #         Babcock Laboratories
+    #     </p>
+    # </a>
+    # """,
+    # unsafe_allow_html=True)    
+    # babcock_articles = babcock_scraper()
+    # c = 1
+    # for article in babcock_articles:
+    #     article_date = parse_date(article['date'])
+    #     if article_date and start_date <= article_date <= end_date:
+    #         st.markdown(f"<h3 style='color:#EE7D11;'>{c}. {article['title']}</h3>", unsafe_allow_html=True)
+    #         st.markdown(f"**Published:** {article_date.strftime('%B %d, %Y')}")
+    #         st.markdown(f"[Read Article]({article['url']})") 
+    #         st.markdown(f"**Description:** {article['description']}")
 
-            st.markdown("---")
-            c+=1
-            save_press_releases_to_db([article])
-    if c==1:
-        st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
-        st.markdown("---")
+    #         st.markdown("---")
+    #         c+=1
+    #         save_press_releases_to_db([article])
+    # if c==1:
+    #     st.markdown(f"<h3 style='color:#EE7D11;'>No press releases were published during the selected date range.", unsafe_allow_html=True)
+    #     st.markdown("---")
 
 
     st.markdown(
