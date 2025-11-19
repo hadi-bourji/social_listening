@@ -341,6 +341,12 @@ def babcock_scraper():
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/122.0.0.0 Safari/537.36"
     )
+
+    
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--disable-software-rasterizer")
+
     driver = webdriver.Chrome(options=options)
 
     # Replace with actual Babcock Laboratories news URL
@@ -348,6 +354,7 @@ def babcock_scraper():
 
     # Wait for article items to load
     
+    driver.set_page_load_timeout(60)
     WebDriverWait(driver, 30).until(
         lambda d: d.execute_script("return document.readyState") == "complete"
     )
