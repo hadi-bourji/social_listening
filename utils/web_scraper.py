@@ -10,7 +10,7 @@ def epa_scraper():
     # Scrapes EPA press release site. Returns each article title, date published, description, and the article URL.
     options = Options()
     options.add_argument("--headless=new")
-    options.binary_location = "/usr/bin/chromium"
+    # options.binary_location = "/usr/bin/chromium"
     #above line should be commented in vscode since browser is found by default. in streamlit we need to give path to browser, so above line is not commented.
     driver = webdriver.Chrome(options=options)
     driver.get("https://www.epa.gov/newsreleases/search")
@@ -347,9 +347,16 @@ def babcock_scraper():
     driver.get("https://www.babcocklabs.com/news")  # Update this URL
 
     # Wait for article items to load
-    news_items = WebDriverWait(driver, 15).until(
-        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry.h-entry.hentry"))
+    
+    WebDriverWait(driver, 30).until(
+        lambda d: d.execute_script("return document.readyState") == "complete"
     )
+
+    # Then wait for articles
+    news_items = WebDriverWait(driver, 20).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "article.entry"))
+)
+
 
     articles = []
     for item in news_items:
