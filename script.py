@@ -26,22 +26,26 @@ st.markdown(
 # --- Sidebar exclusions ---
 EXCLUDED_RSS_FILE = "excluded_rss.txt"
 EXCLUDED_KEYWORDS_FILE = "excluded_keywords.txt"
+USER_RSS_FILE = "user_rss.txt"
+USER_KEYWORD_FILE = "user_keyword.txt"
 
-def load_exclusions(filepath):
-    """Load exclusions from a file (creates file if missing)."""
+def load_files(filepath):
+    """Load user customizations from a file (creates file if missing)."""
     if not os.path.exists(filepath):
         with open(filepath, "w"): 
             pass
     with open(filepath, "r") as f:
         return {line.strip() for line in f if line.strip()}
 
-def add_to_exclusions(filepath, item):
-    """Append an item to the exclusions file."""
+def add_to_file(filepath, item):
+    """Append an item to the file."""
     with open(filepath, "a") as f:
         f.write(item + "\n")
 
-excluded_rss = load_exclusions(EXCLUDED_RSS_FILE)
-excluded_keywords = load_exclusions(EXCLUDED_KEYWORDS_FILE)
+excluded_rss = load_files(EXCLUDED_RSS_FILE)
+excluded_keywords = load_files(EXCLUDED_KEYWORDS_FILE)
+user_rss = load_files(USER_RSS_FILE)
+user_keyword = load_files(USER_KEYWORD_FILE)
 
 
 # --- Sidebar Inputs ---
@@ -102,7 +106,7 @@ with st.sidebar:
         st.markdown("---")
         rss_to_remove = st.selectbox("Delete a feed permanently", ["None"] + default_rss, key="remove_rss")
         if rss_to_remove != "None" and st.button("Delete Feed"):
-            add_to_exclusions(EXCLUDED_RSS_FILE, rss_to_remove)
+            add_to_file(EXCLUDED_RSS_FILE, rss_to_remove)
             st.success(f"Removed feed: {rss_to_remove}")
             st.rerun()
         st.markdown("---")
@@ -146,7 +150,7 @@ with st.sidebar:
         st.markdown("---")
         kw_to_remove = st.selectbox("Delete a keyword permanently", ["None"] + default_keywords, key="remove_kw")
         if kw_to_remove != "None" and st.button("Delete Keyword"):
-            add_to_exclusions(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
+            add_to_file(EXCLUDED_KEYWORDS_FILE, kw_to_remove)
             st.success(f"Removed keyword: {kw_to_remove}")
             st.rerun()
 
@@ -557,8 +561,9 @@ with tab_keyword_trends:
 
 
 with tab_settings:
+
     @st.fragment
-    def deletion():
+    def feed_deletion():
         # st.subheader("Manage RSS Feeds")
         st.markdown("---")
         
@@ -566,8 +571,24 @@ with tab_settings:
             cols = st.columns([6,1])
             cols[0].write(feed)
             if cols[1].button("Delete permanently", key=f"delete_{feed}"):
-                add_to_exclusions(EXCLUDED_RSS_FILE,feed)
-                st.success(f"Removed {feed}")
+                add_to_file(EXCLUDED_RSS_FILE, feed)
+                st.success(f"Removed RSS site: {feed}")
             st.markdown("---")
+
+    @st.fragment
+    def keyword_deletion():
+        # st.subheader("Manage Keywords")
+        st.markdown("---")
+        
+        for word in all_keywords:
+            cols = st.columns([6,1])
+            cols[0].write(word)
+            if cols[1].button("Delete permanently", key=f"delete_{word}"):
+                add_to_file(EXCLUDED_KEYWORDS_FILE, word)
+                st.success(f"Removed keyword: {word}")
+            st.markdown("---")
+    st.info("Please refresh the page after selecting items to permanently delete for the changes to take effect.")
     with st.expander("Manage RSS Feeds"):
-        deletion()
+        feed_deletion()
+    with st.expander("Manage Keywords"):
+        keyword_deletion()
