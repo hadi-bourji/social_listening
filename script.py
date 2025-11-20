@@ -47,6 +47,11 @@ excluded_keywords = load_files(EXCLUDED_KEYWORDS_FILE)
 user_rss = load_files(USER_RSS_FILE)
 user_keyword = load_files(USER_KEYWORD_FILE)
 
+if "user_keyword_set" not in st.session_state:
+    st.session_state.user_keyword_set = user_keyword
+
+if "user_rss_set" not in st.session_state:
+    st.session_state.user_rss_set = user_rss
 
 # --- Sidebar Inputs ---
 with st.sidebar:
@@ -92,7 +97,7 @@ with st.sidebar:
         "https://www.tristatehomepage.com/feed/",
         "https://envnewsbits.info/feed/"
     ]
-    
+
     default_rss = [rss for rss in default_rss if rss not in excluded_rss]
     extra_rss_input = st.text_area("Extra RSS Feed URLs (one per line)", value="", key="extra_rss_input")
 
@@ -101,9 +106,9 @@ with st.sidebar:
         for feed in new_feeds:
             if feed not in user_rss:
                 add_to_file(USER_RSS_FILE, feed)
-                user_rss.add(feed)
+                st.session_state.user_rss_set.add(feed)
 
-    all_rss = default_rss + list(user_rss)
+    all_rss = default_rss + list(st.session_state.user_rss_set)
 
     
 
@@ -140,8 +145,15 @@ with st.sidebar:
     ]
     default_keywords = [kw for kw in default_keywords if kw not in excluded_keywords]
     extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
-    extra_keywords = [kw.strip().lower() for kw in extra_keyword_input.splitlines() if kw.strip()]
-    all_keywords = sorted(default_keywords + extra_keywords, key=lambda x: x.lower())
+    
+    if extra_keyword_input.strip():
+        new_keywords = [line.strip() for line in extra_keyword_input.splitlines() if line.strip()]
+        for keyword in new_keywords:
+            if keyword not in user_keyword:
+                add_to_file(USER_KEYWORD_FILE, keyword)
+                st.session_state.user_keyword_set.add(keyword)
+    
+    all_keywords = sorted(default_keywords + list(st.session_state.user_keyword_set), key=lambda x: x.lower())
 
     with st.expander("Manage Keywords"):
         
