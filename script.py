@@ -42,6 +42,18 @@ def add_to_file(filepath, item):
     with open(filepath, "a") as f:
         f.write(item + "\n")
 
+def remove_from_file(filepath, item):
+    """Remove a line from a file."""
+    if not os.path.exists(filepath):
+        return
+    with open(filepath, "r") as f:
+        lines = f.readlines()
+    with open(filepath, "w") as f:
+        for line in lines:
+            if line.strip() != item:
+                f.write(line)
+
+
 excluded_rss = load_files(EXCLUDED_RSS_FILE)
 excluded_keywords = load_files(EXCLUDED_KEYWORDS_FILE)
 user_rss = load_files(USER_RSS_FILE)
@@ -104,6 +116,10 @@ with st.sidebar:
     if extra_rss_input.strip():
         new_feeds = [line.strip() for line in extra_rss_input.splitlines() if line.strip()]
         for feed in new_feeds:
+            if feed in excluded_rss:
+                excluded_rss.remove(feed)
+                remove_from_file(EXCLUDED_RSS_FILE, feed)
+
             if feed not in user_rss:
                 add_to_file(USER_RSS_FILE, feed)
                 st.session_state.user_rss_set.add(feed)
@@ -149,6 +165,11 @@ with st.sidebar:
     if extra_keyword_input.strip():
         new_keywords = [line.strip() for line in extra_keyword_input.splitlines() if line.strip()]
         for keyword in new_keywords:
+
+            if keyword in excluded_keywords:
+                excluded_keywords.remove(keyword)
+                remove_from_file(EXCLUDED_KEYWORDS_FILE, keyword)
+
             if keyword not in user_keyword:
                 add_to_file(USER_KEYWORD_FILE, keyword)
                 st.session_state.user_keyword_set.add(keyword)
