@@ -598,6 +598,11 @@ with tab_settings:
             cols = st.columns([6,1])
             cols[0].write(feed)
             if cols[1].button("Delete permanently", key=f"delete_{feed}"):
+
+                if feed in st.session_state.user_rss_set:
+                    st.session_state.user_rss_set.remove(feed)
+                    remove_from_file(USER_RSS_FILE, feed)
+
                 add_to_file(EXCLUDED_RSS_FILE, feed)
                 st.success(f"Removed RSS site: {feed}")
             st.markdown("---")
@@ -611,9 +616,16 @@ with tab_settings:
             cols = st.columns([6,1])
             cols[0].write(word)
             if cols[1].button("Delete permanently", key=f"delete_{word}"):
+
+                if word in st.session_state.user_keyword_set:
+                    st.session_state.user_keyword_set.remove(word)
+                    remove_from_file(USER_KEYWORD_FILE, word)
+
                 add_to_file(EXCLUDED_KEYWORDS_FILE, word)
                 st.success(f"Removed keyword: {word}")
+
             st.markdown("---")
+            
     st.info("Please refresh the page after selecting items to permanently delete for the changes to take effect.")
     with st.expander("Manage RSS Feeds"):
         feed_deletion()
