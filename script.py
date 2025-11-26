@@ -10,6 +10,7 @@ from utils.articles import display_articles, update_feed_and_archive, parse_date
 from utils.archive import ensure_articles_table, save_articles_to_db, query_articles, save_press_releases_to_db
 from utils.web_scraper import pacelabs_scraper, epa_scraper, sgs_scraper, montrose_scraper, gel_scraper, emsl_scraper, babcock_scraper, wecklabs_scraper, alsglobal_scraper, microbac_scraper
 from utils.reddit_api import last_12_month, monthly_comment_totals
+from streamlit_tags import st_tags
 
 random_approx_hour = random.uniform(3240000,3960000) #generate random number between .9 and 1.1 hours (converted to milliseconds) for autorefresh interval
 ensure_articles_table() 
@@ -160,26 +161,23 @@ with st.sidebar:
         "Chemical Incident", "Hazmat", "Environmental Hazards", "Environmental Hazard", "Chemical Fire"
     ]
     default_keywords = [kw for kw in default_keywords if kw not in excluded_keywords]
-    extra_keyword_input = st.text_area("Extra Keywords (one per line)", value="", key="extra_keywords_input")
-    
-    if extra_keyword_input.strip():
-        new_keywords = [line.strip() for line in extra_keyword_input.splitlines() if line.strip()]
-        for keyword in new_keywords:
-
-            if keyword in excluded_keywords:
-                excluded_keywords.remove(keyword)
-                remove_from_file(EXCLUDED_KEYWORDS_FILE, keyword)
-
-            if keyword not in user_keyword:
-                add_to_file(USER_KEYWORD_FILE, keyword)
-                st.session_state.user_keyword_set.add(keyword)
     
     all_keywords = sorted(default_keywords + list(st.session_state.user_keyword_set), key=lambda x: x.lower())
 
     with st.expander("Manage Keywords"):
         
-        select_all_keywords = st.checkbox("Select/Deselect All Keywords", value=True, key="select_all_keywords")
-        selected_keywords = [kw for kw in all_keywords if st.checkbox(kw, value=select_all_keywords, key=f"kw_{kw}")]
+        selected_keywords = st_tags(label='', text='Add a keyword', value=all_keywords, suggestions= [], maxtags=-1, key='keyword_tag_input')
+    
+    for word in selected_keywords:
+        if word not in all_keywords:
+            if word in excluded_keywords:
+                excluded_keywords.remove(word)
+                remove_from_file(EXCLUDED_KEYWORDS_FILE, word)
+
+            if word not in user_keyword:
+                add_to_file(USER_KEYWORD_FILE, word)
+                st.session_state.user_keyword_set.add(word)
+
 
 
 # --- Tabs ---
